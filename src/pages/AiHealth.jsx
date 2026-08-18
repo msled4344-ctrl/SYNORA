@@ -297,26 +297,6 @@ export const AiHealth = () => {
 
         {/* Message Stream */}
         <div className="chat-messages" ref={chatMessagesRef}>
-          {/* Subtle Emergency Notice */}
-          <div
-            style={{
-              background: 'var(--bg-tertiary)',
-              border: '1px solid var(--border-subtle)',
-              padding: '0.6rem 1rem',
-              borderRadius: 'var(--radius-md)',
-              fontSize: '0.8rem',
-              color: 'var(--text-muted)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '0.4rem',
-              textAlign: 'center',
-            }}
-          >
-            <ShieldAlert size={14} color="var(--brand-primary)" />
-            <span>SYNORA is an informational assistant. In severe medical emergencies, immediately call <strong>999 / 911</strong>.</span>
-          </div>
-
           {messages.map((msg) => {
             const isAi = msg.sender === 'ai';
             const isSpeaking = speakingMessageId === msg.id;
