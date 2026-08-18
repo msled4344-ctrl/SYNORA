@@ -248,7 +248,7 @@ export const AiHealth = () => {
             </div>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+          <div className="chat-header-actions" style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
             {/* Context Toggle */}
             <button
               type="button"
@@ -261,10 +261,11 @@ export const AiHealth = () => {
                 gap: '0.4rem',
                 fontSize: '0.82rem',
                 color: includeContext ? 'var(--brand-primary)' : 'var(--text-muted)',
+                padding: '0.35rem 0.5rem',
               }}
             >
               {includeContext ? <ToggleRight size={20} color="var(--brand-primary)" /> : <ToggleLeft size={20} />}
-              <span style={{ display: 'inline' }}>
+              <span className="chat-context-text">
                 {includeContext ? 'Health Profile Active' : 'Generic Mode'}
               </span>
             </button>
@@ -275,6 +276,7 @@ export const AiHealth = () => {
               className="btn btn-secondary btn-sm"
               onClick={() => setShowHistoryDrawer((prev) => !prev)}
               title="View Chat History"
+              style={{ padding: '0.35rem 0.65rem' }}
             >
               <History size={16} />
               <span>{language === 'bn' ? 'হিস্ট্রি' : 'History'}</span>
@@ -286,8 +288,9 @@ export const AiHealth = () => {
               className="btn btn-ghost btn-icon"
               onClick={handleClearChat}
               title="Clear current conversation"
+              style={{ width: '36px', height: '36px' }}
             >
-              <Trash2 size={18} color="var(--status-danger)" />
+              <Trash2 size={17} color="var(--status-danger)" />
             </button>
           </div>
         </div>

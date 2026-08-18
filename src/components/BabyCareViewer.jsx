@@ -167,12 +167,15 @@ export const BabyCareViewer = ({ initialAgeId = '1m', onAddBabyClick }) => {
         </div>
 
         <div
+          className="baby-age-scroll"
           style={{
             display: 'flex',
             gap: '0.45rem',
             overflowX: 'auto',
             paddingBottom: '0.5rem',
-            scrollbarWidth: 'thin',
+            scrollbarWidth: 'none',
+            WebkitOverflowScrolling: 'touch',
+            scrollSnapType: 'x mandatory',
           }}
         >
           {babyCare.map((item) => {
@@ -183,17 +186,19 @@ export const BabyCareViewer = ({ initialAgeId = '1m', onAddBabyClick }) => {
                 type="button"
                 onClick={() => setSelectedAgeId(item.ageId)}
                 style={{
-                  padding: '0.6rem 1.1rem',
+                  padding: '0.55rem 1rem',
                   borderRadius: 'var(--radius-md)',
                   background: isSelected ? 'var(--brand-navy)' : 'var(--bg-card)',
                   color: isSelected ? '#ffffff' : 'var(--text-primary)',
                   border: isSelected ? '1.5px solid var(--brand-navy)' : '1px solid var(--border-subtle)',
                   fontWeight: isSelected ? '700' : '500',
-                  fontSize: '0.88rem',
+                  fontSize: '0.86rem',
                   whiteSpace: 'nowrap',
                   cursor: 'pointer',
                   transition: 'all var(--transition-fast)',
                   boxShadow: isSelected ? 'var(--shadow-md)' : 'none',
+                  flexShrink: 0,
+                  scrollSnapAlign: 'start',
                 }}
               >
                 {item.ageLabel || item.ageId}
@@ -209,7 +214,7 @@ export const BabyCareViewer = ({ initialAgeId = '1m', onAddBabyClick }) => {
         style={{
           background: 'linear-gradient(135deg, var(--brand-primary-light) 0%, var(--bg-card) 100%)',
           borderColor: 'rgba(0, 168, 150, 0.25)',
-          padding: '1.75rem',
+          padding: 'clamp(1.25rem, 2.5vw, 1.75rem)',
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '0.5rem' }}>
@@ -229,14 +234,15 @@ export const BabyCareViewer = ({ initialAgeId = '1m', onAddBabyClick }) => {
           )}
         </div>
 
-        <h2 style={{ fontSize: '1.45rem', marginBottom: '0.5rem' }}>{currentContent.title}</h2>
-        <p style={{ fontSize: '0.95rem', color: 'var(--text-secondary)', maxWidth: '900px', lineHeight: '1.65' }}>
+        <h2 style={{ fontSize: 'clamp(1.2rem, 2.5vw, 1.45rem)', marginBottom: '0.5rem' }}>{currentContent.title}</h2>
+        <p style={{ fontSize: '0.92rem', color: 'var(--text-secondary)', maxWidth: '900px', lineHeight: '1.65' }}>
           {currentContent.description}
         </p>
       </div>
 
       {/* Categorized Tab Navigation */}
       <div
+        className="baby-tabs-scroll"
         style={{
           display: 'flex',
           gap: '0.35rem',
@@ -244,6 +250,8 @@ export const BabyCareViewer = ({ initialAgeId = '1m', onAddBabyClick }) => {
           borderBottom: '1.5px solid var(--border-subtle)',
           paddingBottom: '0.25rem',
           scrollbarWidth: 'none',
+          WebkitOverflowScrolling: 'touch',
+          scrollSnapType: 'x mandatory',
         }}
       >
         {tabs.map((tab) => {

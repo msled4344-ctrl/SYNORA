@@ -131,12 +131,12 @@ export const MedicineCard = ({ medicine }) => {
             style={{
               maxWidth: '680px',
               width: '100%',
-              maxHeight: '90vh',
+              maxHeight: 'min(90dvh, 800px)',
               overflowY: 'auto',
               background: 'var(--bg-card)',
               borderRadius: 'var(--radius-xl)',
               boxShadow: 'var(--shadow-xl)',
-              padding: '2rem',
+              padding: 'clamp(1.25rem, 3vw, 2rem)',
             }}
           >
             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '1.25rem' }}>
@@ -224,7 +224,7 @@ export const MedicineCard = ({ medicine }) => {
               )}
 
               {/* Storage & Doctor Advice */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', background: 'var(--bg-tertiary)', padding: '1rem', borderRadius: 'var(--radius-md)' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 220px), 1fr))', gap: '1rem', background: 'var(--bg-tertiary)', padding: '1rem', borderRadius: 'var(--radius-md)' }}>
                 <div>
                   <strong style={{ fontSize: '0.82rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.2rem' }}>
                     Storage Instructions:

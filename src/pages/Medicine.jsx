@@ -141,14 +141,16 @@ export const Medicine = () => {
 
         {/* Category Filter Pills */}
         <div
+          className="medicine-category-pills"
           style={{
             display: 'flex',
-            gap: '0.5rem',
+            gap: '0.45rem',
             overflowX: 'auto',
-            paddingBottom: '1rem',
-            marginBottom: '2rem',
+            paddingBottom: '0.75rem',
+            marginBottom: '1.75rem',
             justifyContent: 'flex-start',
             scrollbarWidth: 'none',
+            WebkitOverflowScrolling: 'touch',
           }}
         >
           {categories.map((cat) => {
@@ -159,7 +161,7 @@ export const Medicine = () => {
                 type="button"
                 onClick={() => setSelectedCategory(cat)}
                 className={`btn btn-sm ${isSelected ? 'btn-primary' : 'btn-secondary'}`}
-                style={{ borderRadius: 'var(--radius-full)', whiteSpace: 'nowrap' }}
+                style={{ borderRadius: 'var(--radius-full)', whiteSpace: 'nowrap', flexShrink: 0 }}
               >
                 {cat}
               </button>
@@ -168,13 +170,13 @@ export const Medicine = () => {
         </div>
 
         {/* Results Info Count */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem', fontSize: '0.9rem', color: 'var(--text-muted)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '1.5rem', fontSize: '0.9rem', color: 'var(--text-muted)' }}>
           <span>
             Showing <strong>{filteredMedicines.length}</strong> verified medicines
           </span>
           <span style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-            <ShieldCheck size={16} color="var(--brand-primary)" />
-            Clinical Reference Database
+            <Sparkles size={14} color="var(--brand-primary)" />
+            <span>Updated Daily</span>
           </span>
         </div>
 
@@ -210,8 +212,8 @@ export const Medicine = () => {
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
-              gap: '1.5rem',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 290px), 1fr))',
+              gap: 'clamp(1rem, 2vw, 1.5rem)',
             }}
           >
             {filteredMedicines.map((medicine) => (

@@ -94,8 +94,8 @@ export const Home = () => {
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-              gap: '3rem',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))',
+              gap: 'clamp(1.75rem, 4vw, 3.5rem)',
               alignItems: 'center',
             }}
           >
@@ -117,14 +117,14 @@ export const Home = () => {
                 )}
               </h1>
 
-              <p style={{ fontSize: '1.15rem', color: 'var(--text-secondary)', marginBottom: '2rem', lineHeight: '1.7' }}>
+              <p style={{ fontSize: 'clamp(1rem, 2vw, 1.15rem)', color: 'var(--text-secondary)', marginBottom: '2rem', lineHeight: '1.7' }}>
                 {language === 'bn'
                   ? 'টাইপ করতে অসুবিধা হলেও সহজে মুখে কথা বলে স্বাস্থ্য পরামর্শ নিন। শিশুর সঠিক যত্ন, ওষুধের নিরাপত্তা তথ্য এবং নিজস্ব হেলথ স্কোর জানুন এক জায়গায়।'
                   : 'SYNORA makes digital health simple for everyone. Speak naturally with voice input, access age-specific child care, verify medicine safety, and track your daily wellness.'}
               </p>
 
               {/* Action Buttons */}
-              <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', marginBottom: '2.5rem' }}>
+              <div style={{ display: 'flex', gap: '0.85rem', flexWrap: 'wrap', marginBottom: '2.5rem' }}>
                 <Link to="/ai-health" className="btn btn-primary btn-lg">
                   <Mic size={20} />
                   <span>{t('askAi')}</span>
@@ -142,7 +142,7 @@ export const Home = () => {
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '1.5rem',
+                  gap: '1.25rem',
                   flexWrap: 'wrap',
                   fontSize: '0.88rem',
                   color: 'var(--text-secondary)',
@@ -245,8 +245,8 @@ export const Home = () => {
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-              gap: '1.5rem',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))',
+              gap: 'clamp(1rem, 2.5vw, 1.5rem)',
             }}
           >
             {quickTools.map((tool, idx) => {
@@ -261,7 +261,7 @@ export const Home = () => {
                     flexDirection: 'column',
                     justifyContent: 'space-between',
                     textDecoration: 'none',
-                    padding: '1.75rem',
+                    padding: 'clamp(1.25rem, 2.5vw, 1.75rem)',
                   }}
                 >
                   <div>
@@ -325,7 +325,7 @@ export const Home = () => {
           <div
             className="card card-glass"
             style={{
-              padding: '2.5rem',
+              padding: 'clamp(1.5rem, 3.5vw, 2.5rem)',
               borderRadius: 'var(--radius-xl)',
               background: 'linear-gradient(135deg, var(--bg-card) 0%, var(--brand-primary-light) 100%)',
               borderColor: 'rgba(0, 168, 150, 0.3)',
@@ -334,8 +334,8 @@ export const Home = () => {
             <div
               style={{
                 display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-                gap: '2.5rem',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))',
+                gap: 'clamp(1.5rem, 3vw, 2.5rem)',
                 alignItems: 'center',
               }}
             >
@@ -343,7 +343,7 @@ export const Home = () => {
                 <span className="badge badge-teal" style={{ marginBottom: '0.75rem' }}>
                   {language === 'bn' ? 'বেবি কেয়ার হাব' : 'Baby Care Hub (1m - 10y)'}
                 </span>
-                <h2 style={{ fontSize: '2rem', marginBottom: '1rem' }}>
+                <h2 style={{ fontSize: 'clamp(1.5rem, 3vw, 2rem)', marginBottom: '1rem' }}>
                   {language === 'bn' ? 'আপনার শিশুর বেড়ে ওঠা হোক নিরাপদ ও সঠিক' : 'Comprehensive Age-Specific Baby & Child Guidance'}
                 </h2>
                 <p style={{ fontSize: '1rem', color: 'var(--text-secondary)', marginBottom: '1.5rem', lineHeight: '1.7' }}>
@@ -352,7 +352,7 @@ export const Home = () => {
                     : 'From exclusive breastfeeding in month 1 to toddler solids, vaccination charts, speech milestones, and emergency red flags, get organized pediatrician-reviewed advice.'}
                 </p>
 
-                <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', marginBottom: '1.75rem' }}>
+                <div style={{ display: 'flex', gap: '0.65rem', flexWrap: 'wrap', marginBottom: '1.75rem' }}>
                   <span className="badge" style={{ background: 'var(--bg-card)', color: 'var(--text-primary)' }}>
                     🍼 Feeding & Weaning
                   </span>
@@ -372,11 +372,11 @@ export const Home = () => {
               </div>
 
               {/* Age Pills Preview */}
-              <div className="card" style={{ padding: '1.5rem', background: 'var(--bg-card)' }}>
+              <div className="card" style={{ padding: 'clamp(1rem, 2vw, 1.5rem)', background: 'var(--bg-card)' }}>
                 <h4 style={{ marginBottom: '1rem', fontSize: '1.05rem' }}>
                   {language === 'bn' ? 'বয়সভিত্তিক দ্রুত লিংক' : 'Select Child Age:'}
                 </h4>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.6rem' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 120px), 1fr))', gap: '0.6rem' }}>
                   {babyCare.slice(0, 8).map((item) => (
                     <Link
                       key={item.ageId}
@@ -412,12 +412,12 @@ export const Home = () => {
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-              gap: '1.5rem',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))',
+              gap: 'clamp(1rem, 2.5vw, 1.5rem)',
             }}
           >
             {healthTips.slice(0, 6).map((tip) => (
-              <div key={tip.id} className="card card-hover" style={{ display: 'flex', flexDirection: 'column' }}>
+              <div key={tip.id} className="card card-hover" style={{ display: 'flex', flexDirection: 'column', padding: 'clamp(1.25rem, 2.5vw, 1.5rem)' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
                   <span className="badge badge-teal">{tip.category}</span>
                   <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{tip.readTime || '3 min'}</span>
@@ -452,7 +452,7 @@ export const Home = () => {
             </h2>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1.5rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 260px), 1fr))', gap: 'clamp(1rem, 2vw, 1.5rem)' }}>
             <div className="card" style={{ padding: '1.75rem' }}>
               <div
                 style={{

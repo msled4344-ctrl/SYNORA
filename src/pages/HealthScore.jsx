@@ -66,8 +66,8 @@ export const HealthScore = () => {
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-            gap: '2rem',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))',
+            gap: 'clamp(1.5rem, 3vw, 2.5rem)',
             marginBottom: '3rem',
           }}
         >
@@ -323,7 +323,7 @@ export const HealthScore = () => {
             <h3 style={{ margin: 0 }}>Health Score Progress Timeline</h3>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 180px), 1fr))', gap: '1rem' }}>
             {scoreHistory.map((item, idx) => (
               <div
                 key={idx}

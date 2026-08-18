@@ -210,19 +210,23 @@ export const Profile = () => {
 
         {/* Tab Navigation */}
         <div
+          className="profile-tabs-scroll"
           style={{
             display: 'flex',
-            gap: '0.5rem',
+            gap: '0.45rem',
             overflowX: 'auto',
             borderBottom: '1.5px solid var(--border-subtle)',
-            paddingBottom: '0.25rem',
+            paddingBottom: '0.35rem',
             marginBottom: '2rem',
+            WebkitOverflowScrolling: 'touch',
+            scrollbarWidth: 'none',
           }}
         >
           <button
             type="button"
             className={`btn btn-sm ${activeTab === 'health' ? 'btn-primary' : 'btn-ghost'}`}
             onClick={() => setActiveTab('health')}
+            style={{ flexShrink: 0 }}
           >
             <Activity size={16} />
             <span>My Health Information</span>
@@ -231,6 +235,7 @@ export const Profile = () => {
             type="button"
             className={`btn btn-sm ${activeTab === 'personal' ? 'btn-primary' : 'btn-ghost'}`}
             onClick={() => setActiveTab('personal')}
+            style={{ flexShrink: 0 }}
           >
             <User size={16} />
             <span>Personal Details</span>
@@ -239,6 +244,7 @@ export const Profile = () => {
             type="button"
             className={`btn btn-sm ${activeTab === 'babies' ? 'btn-primary' : 'btn-ghost'}`}
             onClick={() => setActiveTab('babies')}
+            style={{ flexShrink: 0 }}
           >
             <Baby size={16} />
             <span>My Children ({babyProfiles.length})</span>
@@ -247,6 +253,7 @@ export const Profile = () => {
             type="button"
             className={`btn btn-sm ${activeTab === 'aichats' ? 'btn-primary' : 'btn-ghost'}`}
             onClick={() => setActiveTab('aichats')}
+            style={{ flexShrink: 0 }}
           >
             <Bot size={16} />
             <span>AI Consultations ({aiChats.length})</span>
@@ -255,7 +262,7 @@ export const Profile = () => {
 
         {/* Tab 1: Health Information Form */}
         {activeTab === 'health' && (
-          <form onSubmit={handleHealthFormSubmit} className="card" style={{ padding: '2rem' }}>
+          <form onSubmit={handleHealthFormSubmit} className="card" style={{ padding: 'clamp(1.25rem, 3vw, 2rem)' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
               <div>
                 <h3 style={{ fontSize: '1.35rem', margin: 0 }}>My Health Biometrics & Vitals</h3>
@@ -265,7 +272,7 @@ export const Profile = () => {
               </div>
 
               {/* Real-time Indicator Badges */}
-              <div style={{ display: 'flex', gap: '0.6rem' }}>
+              <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap' }}>
                 {liveBmi && (
                   <span className="badge" style={{ background: `${liveBmi.badgeColor}20`, color: liveBmi.badgeColor }}>
                     BMI: {liveBmi.value} ({liveBmi.category})
@@ -284,7 +291,7 @@ export const Profile = () => {
               1. Biometrics & Core Vitals
             </h4>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.25rem', marginBottom: '1.75rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 180px), 1fr))', gap: '1.25rem', marginBottom: '1.75rem' }}>
               <div className="form-group">
                 <label className="form-label">Age (Years)</label>
                 <input
@@ -339,7 +346,7 @@ export const Profile = () => {
               2. Blood Pressure & Metabolic Status
             </h4>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.25rem', marginBottom: '1.75rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 180px), 1fr))', gap: '1.25rem', marginBottom: '1.75rem' }}>
               <div className="form-group">
                 <label className="form-label">Systolic BP (mmHg)</label>
                 <input
@@ -365,15 +372,16 @@ export const Profile = () => {
               </div>
 
               <div className="form-group">
-                <label className="form-label">Fasting Blood Sugar (mg/dL)</label>
+                <label className="form-label">Fasting Sugar (mmol/L)</label>
                 <input
                   type="number"
+                  step="0.1"
                   className="form-input"
-                  placeholder="e.g. 95"
+                  placeholder="e.g. 5.5"
                   value={formData.fastingSugar || ''}
                   onChange={(e) => setFormData({ ...formData, fastingSugar: parseFloat(e.target.value) || '' })}
                 />
-                <span className="form-hint">Normal: 70 - 99 mg/dL</span>
+                <span className="form-hint">Normal: 4.0 – 6.0</span>
               </div>
 
               <div className="form-group">
@@ -396,7 +404,7 @@ export const Profile = () => {
               3. Lifestyle, Sleep & Hydration
             </h4>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.25rem', marginBottom: '1.75rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 180px), 1fr))', gap: '1.25rem', marginBottom: '1.75rem' }}>
               <div className="form-group">
                 <label className="form-label">Daily Physical Activity</label>
                 <select
@@ -451,7 +459,7 @@ export const Profile = () => {
               4. Allergies & Current Medications
             </h4>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem', marginBottom: '2rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 240px), 1fr))', gap: '1.25rem', marginBottom: '2rem' }}>
               <div className="form-group">
                 <label className="form-label">Known Allergies (Comma separated)</label>
                 <input
@@ -586,7 +594,7 @@ export const Profile = () => {
                 No child profiles saved yet. Add a child from the Baby Care section.
               </div>
             ) : (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.25rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 260px), 1fr))', gap: '1.25rem' }}>
                 {babyProfiles.map((baby) => (
                   <div key={baby.id} className="card" style={{ background: 'var(--bg-tertiary)' }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem' }}>

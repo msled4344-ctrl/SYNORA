@@ -138,21 +138,25 @@ export const Admin = () => {
           </div>
         )}
 
-        {/* Admin Tabs */}
+        {/* Navigation Tabs */}
         <div
+          className="admin-tabs-scroll"
           style={{
             display: 'flex',
             gap: '0.4rem',
             overflowX: 'auto',
             borderBottom: '1.5px solid var(--border-subtle)',
-            paddingBottom: '0.25rem',
+            paddingBottom: '0.35rem',
             marginBottom: '2rem',
+            WebkitOverflowScrolling: 'touch',
+            scrollbarWidth: 'none',
           }}
         >
           <button
             type="button"
             className={`btn btn-sm ${activeTab === 'overview' ? 'btn-primary' : 'btn-ghost'}`}
             onClick={() => setActiveTab('overview')}
+            style={{ flexShrink: 0 }}
           >
             <BarChart3 size={16} />
             <span>Overview & Stats</span>
@@ -161,6 +165,7 @@ export const Admin = () => {
             type="button"
             className={`btn btn-sm ${activeTab === 'tips' ? 'btn-primary' : 'btn-ghost'}`}
             onClick={() => setActiveTab('tips')}
+            style={{ flexShrink: 0 }}
           >
             <BookOpen size={16} />
             <span>Health Tips ({healthTips.length})</span>
@@ -169,6 +174,7 @@ export const Admin = () => {
             type="button"
             className={`btn btn-sm ${activeTab === 'babycare' ? 'btn-primary' : 'btn-ghost'}`}
             onClick={() => setActiveTab('babycare')}
+            style={{ flexShrink: 0 }}
           >
             <Baby size={16} />
             <span>Baby Care ({babyCare.length})</span>
@@ -177,6 +183,7 @@ export const Admin = () => {
             type="button"
             className={`btn btn-sm ${activeTab === 'medicines' ? 'btn-primary' : 'btn-ghost'}`}
             onClick={() => setActiveTab('medicines')}
+            style={{ flexShrink: 0 }}
           >
             <Pill size={16} />
             <span>Medicines ({medicines.length})</span>
@@ -185,6 +192,7 @@ export const Admin = () => {
             type="button"
             className={`btn btn-sm ${activeTab === 'ratings' ? 'btn-primary' : 'btn-ghost'}`}
             onClick={() => setActiveTab('ratings')}
+            style={{ flexShrink: 0 }}
           >
             <Activity size={16} />
             <span>Rating Engine Rules</span>
@@ -193,6 +201,7 @@ export const Admin = () => {
             type="button"
             className={`btn btn-sm ${activeTab === 'contacts' ? 'btn-primary' : 'btn-ghost'}`}
             onClick={() => setActiveTab('contacts')}
+            style={{ flexShrink: 0 }}
           >
             <Mail size={16} />
             <span>Inquiries ({contacts.length})</span>
@@ -201,6 +210,7 @@ export const Admin = () => {
             type="button"
             className={`btn btn-sm ${activeTab === 'settings' ? 'btn-primary' : 'btn-ghost'}`}
             onClick={() => setActiveTab('settings')}
+            style={{ flexShrink: 0 }}
           >
             <Settings size={16} />
             <span>Site Hotlines</span>
@@ -210,7 +220,7 @@ export const Admin = () => {
         {/* 1. Overview Tab */}
         {activeTab === 'overview' && (
           <div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1.25rem', marginBottom: '2.5rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))', gap: '1.25rem', marginBottom: '2.5rem' }}>
               <div className="card" style={{ padding: '1.5rem' }}>
                 <div style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginBottom: '0.35rem' }}>Total Consultations</div>
                 <div style={{ fontSize: '2rem', fontWeight: '800', fontFamily: 'var(--font-display)', color: 'var(--brand-primary)' }}>
@@ -244,9 +254,9 @@ export const Admin = () => {
               </div>
             </div>
 
-            <div className="card" style={{ padding: '2rem' }}>
+            <div className="card" style={{ padding: 'clamp(1.25rem, 3vw, 2rem)' }}>
               <h3 style={{ marginBottom: '1rem' }}>Platform Operational Status</h3>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 240px), 1fr))', gap: '1rem' }}>
                 <div style={{ background: 'var(--bg-tertiary)', padding: '1rem', borderRadius: 'var(--radius-md)' }}>
                   <div style={{ fontWeight: '600', fontSize: '0.92rem', marginBottom: '0.25rem' }}>AI Safety Filter</div>
                   <span className="badge badge-success">ACTIVE & ENFORCED</span>
@@ -678,7 +688,7 @@ export const Admin = () => {
               </div>
             )}
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '1rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 280px), 1fr))', gap: '1rem' }}>
               {medicines.map((med) => (
                 <div key={med.id} className="card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: '1.25rem' }}>
                   <div>
