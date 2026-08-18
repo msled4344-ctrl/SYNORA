@@ -22,26 +22,36 @@ import { useAuth } from '../context/AuthContext';
 import { useHealthData } from '../context/HealthDataContext';
 import { useLanguage } from '../context/LanguageContext';
 
+const getWelcomeMessage = (lang) => ({
+  id: 'msg-welcome',
+  sender: 'ai',
+  text: lang === 'bn'
+    ? '**সিনোরা এআই-তে স্বাগতম!** 👋\n\nআজ আমি আপনাকে কীভাবে সাহায্য করতে পারি?'
+    : '**Welcome to SYNORA AI!** 👋\n\nHow can I help you today?',
+  timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+  followUps: [
+    lang === 'bn' ? 'আমার সর্দি ও জ্বর হয়েছে, কী করব?' : 'I have a cold and mild fever, what to do?',
+    lang === 'bn' ? 'মাথা ব্যথার প্রাথমিক ঘরোয়া উপায় কী?' : 'How to relieve tension headaches?',
+    lang === 'bn' ? 'ভালো ঘুমের জন্য কী করা যায়?' : 'Tips for deeper, restful sleep',
+  ],
+});
+
 export const AiHealth = () => {
   const { currentUser } = useAuth();
   const { healthProfile, aiChats, saveAiConversation, deleteAiConversation, clearAllAiChats } = useHealthData();
   const { language, t } = useLanguage();
 
-  const [messages, setMessages] = useState([
-    {
-      id: 'msg-welcome',
-      sender: 'ai',
-      text: language === 'bn'
-        ? `**স্বাগতম! আমি সিনোরা এআই স্বাস্থ্য সহায়িকা।**\n\nআপনি বাংলায় বা ইংরেজিতে যেকোনো স্বাস্থ্য জিজ্ঞাসা, ঘরোয়া যত্ন, বা লক্ষণ সম্পর্কে প্রশ্ন করতে পারেন। টাইপ করতে সমস্যা হলে পাশে থাকা **মাইক্রোফোন** বাটনে চাপ দিয়ে মুখে বলুন।`
-        : `**Welcome! I am your SYNORA AI Health Assistant.**\n\nYou can ask about general symptoms, home care tips, nutrition, or everyday wellness. If typing is difficult, tap the **Microphone** button to speak naturally.`,
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      followUps: [
-        language === 'bn' ? 'আমার সর্দি ও জ্বর হয়েছে, কী করব?' : 'I have a cold and mild fever, what to do?',
-        language === 'bn' ? 'মাথা ব্যথার ঘরোয়া উপায় কী?' : 'How to relieve tension headaches?',
-        language === 'bn' ? 'ঘুম ভালো হওয়ার স্বাস্থ্য টিপস' : 'Tips for deeper, restful sleep',
-      ],
-    },
-  ]);
+  const [messages, setMessages] = useState([getWelcomeMessage(language)]);
+
+  // Dynamically update welcome message on language toggle if user has not messaged yet
+  useEffect(() => {
+    setMessages((prev) => {
+      if (prev.length === 1 && prev[0].id?.startsWith('msg-welcome')) {
+        return [getWelcomeMessage(language)];
+      }
+      return prev;
+    });
+  }, [language]);
 
   const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -196,16 +206,7 @@ export const AiHealth = () => {
   const handleClearChat = () => {
     stopSpeaking();
     setSpeakingMessageId(null);
-    setMessages([
-      {
-        id: `msg-welcome-${Date.now()}`,
-        sender: 'ai',
-        text: language === 'bn'
-          ? 'কথোপকথন রিসেট হয়েছে। আপনার নতুন স্বাস্থ্য প্রশ্ন বলুন বা লিখুন।'
-          : 'Conversation cleared. What healthcare topic would you like to explore?',
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      },
-    ]);
+    setMessages([getWelcomeMessage(language)]);
   };
 
   const handleLoadSavedChat = (chat) => {
