@@ -1,0 +1,92 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper function to check authentication
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Helper function to check owner
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    // Helper function to check admin role
+    function isAdmin() {
+      return isAuthenticated() && (
+        request.auth.token.email == 'msled4344@gmail.com' ||
+        request.auth.token.email == 'sumonkin523@gmail.com' ||
+        request.auth.token.email == 'sumonraja4344@gmail.com' ||
+        request.auth.token.role == 'admin'
+      );
+    }
+
+    // User account documents
+    match /users/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
+      allow create: if isAuthenticated() && request.auth.uid == userId;
+      allow update: if isOwner(userId) || isAdmin();
+      allow delete: if isAdmin();
+      
+      // User's nested sub-collections (e.g. Baby Profiles)
+      match /babyProfiles/{babyId} {
+        allow read, write: if isOwner(userId);
+      }
+    }
+
+    // Private Health Profiles
+    match /healthProfiles/{userId} {
+      allow read, write: if isOwner(userId);
+      allow delete: if isOwner(userId);
+    }
+
+    // Health Assessments & Score History
+    match /healthAssessments/{assessmentId} {
+      allow read: if isAuthenticated() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if isAuthenticated() && resource.data.userId == request.auth.uid;
+    }
+
+    // AI Conversations History
+    match /aiConversations/{convoId} {
+      allow read, write: if isAuthenticated() && (
+        request.resource.data.userId == request.auth.uid ||
+        resource.data.userId == request.auth.uid
+      );
+      allow delete: if isAuthenticated() && resource.data.userId == request.auth.uid;
+    }
+
+    // Public readable health content - Managed by Admins
+    match /healthTips/{tipId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /babyCare/{babyId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /medicines/{medicineId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /healthRatings/{ratingId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /siteSettings/{settingId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Contact Inquiries: Anyone can submit, only Admin can read/manage
+    match /contacts/{contactId} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
+  }
+}
