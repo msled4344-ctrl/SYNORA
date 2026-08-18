@@ -3,7 +3,6 @@ import { Routes, Route, useLocation } from 'react-router-dom';
 import { Navbar } from './components/Navbar';
 import { Taskbar } from './components/Taskbar';
 import { Footer } from './components/Footer';
-import { EmergencyBanner } from './components/EmergencyBanner';
 
 import { Home } from './pages/Home';
 import { AiHealth } from './pages/AiHealth';
@@ -32,7 +31,6 @@ export const App = () => {
   return (
     <div className="app-container">
       <ScrollToTop />
-      <EmergencyBanner />
       <Navbar />
 
       <main className="main-content">
