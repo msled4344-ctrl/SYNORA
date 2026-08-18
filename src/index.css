@@ -2458,8 +2458,8 @@ img, svg {
 .hero-main-title {
   font-size: clamp(2rem, 4.8vw, 3.35rem);
   font-weight: 800;
-  line-height: 1.18;
-  letter-spacing: -0.025em;
+  line-height: 1.25;
+  letter-spacing: -0.015em;
   margin-bottom: 1.35rem;
   color: var(--text-primary);
   overflow-wrap: break-word;
