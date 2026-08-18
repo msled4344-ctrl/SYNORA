@@ -58,8 +58,8 @@ export const BabyCare = () => {
         {/* Page Header */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem', marginBottom: '2.5rem' }}>
           <div>
-            <h1 style={{ fontSize: '2.25rem', marginBottom: '0.4rem' }}>
-              {language === 'bn' ? 'বয়সভিত্তিক বেবি কেয়ার' : 'Age-Based Baby Care & Development'}
+            <h1 style={{ fontSize: 'clamp(2.4rem, 5vw, 3.25rem)', fontWeight: '800', letterSpacing: '-0.025em', lineHeight: '1.2', marginBottom: '0.6rem' }}>
+              {language === 'bn' ? 'বয়সভিত্তিক বেবি কেয়ার ও বিকাশ' : 'Age-Based Baby Care & Development'}
             </h1>
             <p style={{ color: 'var(--text-secondary)', fontSize: '1.05rem', maxWidth: '680px' }}>
               {language === 'bn'
