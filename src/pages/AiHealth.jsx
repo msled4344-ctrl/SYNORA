@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import {
   Bot,
   User,
@@ -37,6 +38,9 @@ const getWelcomeMessage = (lang) => ({
 });
 
 export const AiHealth = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const initialQuery = searchParams.get('q');
+
   const { currentUser } = useAuth();
   const { healthProfile, aiChats, saveAiConversation, deleteAiConversation, clearAllAiChats } = useHealthData();
   const { language, t } = useLanguage();
@@ -181,6 +185,12 @@ export const AiHealth = () => {
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (initialQuery && initialQuery.trim()) {
+      handleSendMessage(initialQuery.trim());
+    }
+  }, [initialQuery]);
 
   const handleVoiceTranscript = (transcriptText) => {
     setInputText(transcriptText);
