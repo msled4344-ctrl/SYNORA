@@ -2529,6 +2529,33 @@ img, svg {
   font-weight: 800;
 }
 
+.hero-word-bn {
+  font-size: 1.16em;
+  font-family: var(--font-bn);
+  padding-right: 0.08em;
+  background: linear-gradient(130deg, #0284c7 0%, #00a896 30%, #6366f1 70%, #ec4899 100%);
+  background-size: 250% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: crazyShine 5s linear infinite alternate, crazyLeadFloat 3.2s ease-in-out infinite alternate;
+}
+
+[data-theme="dark"] .hero-word-bn {
+  background: linear-gradient(130deg, #38bdf8 0%, #2dd4bf 30%, #818cf8 70%, #f472b6 100%);
+  background-size: 250% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 4px 16px rgba(56, 189, 248, 0.45));
+}
+
+[data-theme="aurora"] .hero-word-bn {
+  background: linear-gradient(130deg, #00f5d4 0%, #7b2cbf 35%, #00bbf9 75%, #fee440 100%);
+  background-size: 250% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 4px 18px rgba(0, 245, 212, 0.5));
+}
+
 .hero-gradient-text {
   background: linear-gradient(135deg, #008778 0%, #00a896 50%, #028090 100%);
   -webkit-background-clip: text;

@@ -104,7 +104,8 @@ export const Home = () => {
               <h1 className="hero-main-title">
                 {language === 'bn' ? (
                   <>
-                    <span className="hero-phrase-sub">সবার জন্য সহজ ও নিরাপদ</span>
+                    <span className="hero-word-crazy hero-word-bn">সবার</span>{' '}
+                    <span className="hero-phrase-sub">জন্য সহজ ও নিরাপদ</span>
                     <br className="hero-title-break" />
                     <span className="hero-gradient-text">স্মার্ট স্বাস্থ্য সেবা</span>
                   </>
