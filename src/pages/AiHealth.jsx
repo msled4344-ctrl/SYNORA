@@ -27,14 +27,10 @@ const getWelcomeMessage = (lang) => ({
   id: 'msg-welcome',
   sender: 'ai',
   text: lang === 'bn'
-    ? '**সিনোরা এআই-তে স্বাগতম!** 👋\n\nআজ আমি আপনাকে কীভাবে সাহায্য করতে পারি?'
-    : '**Welcome to SYNORA AI!** 👋\n\nHow can I help you today?',
+    ? '**স্বাগতম!** 👋\nআজ আপনার স্বাস্থ্য বা লক্ষণ সম্পর্কে কোনো প্রশ্ন থাকলে লিখুন।'
+    : '**Welcome!** 👋\nHow can I assist with your health or symptoms today?',
   timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-  followUps: [
-    lang === 'bn' ? 'আমার সর্দি ও জ্বর হয়েছে, কী করব?' : 'I have a cold and mild fever, what to do?',
-    lang === 'bn' ? 'মাথা ব্যথার প্রাথমিক ঘরোয়া উপায় কী?' : 'How to relieve tension headaches?',
-    lang === 'bn' ? 'ভালো ঘুমের জন্য কী করা যায়?' : 'Tips for deeper, restful sleep',
-  ],
+  followUps: [],
 });
 
 export const AiHealth = () => {
@@ -93,12 +89,31 @@ export const AiHealth = () => {
     }
   }, [inputText]);
 
-  const suggestedQuestions = [
-    language === 'bn' ? 'আজকে আমার সর্দি লাগছে আমি কী কী ওষুধ খাব?' : 'I have a runny nose and cold. What home care and OTC medicines are safe?',
-    language === 'bn' ? 'মাথা ব্যথা ও ঘাড়ের ব্যথার উপশম' : 'I have a headache and eye strain. What should I do?',
-    language === 'bn' ? 'গ্যাস্ট্রিক ও বুক জ্বালাপোড়া কমানোর উপায়' : 'How can I relieve acidity and heartburn naturally?',
-    language === 'bn' ? 'শিশুর জ্বর ও যত্নের নিয়ম' : 'What is safe fever management for infants?',
-    language === 'bn' ? 'উচ্চ রক্তচাপ নিয়ন্ত্রণে করণীয়' : 'Lifestyle habits to stabilize blood pressure',
+  const quickTopics = [
+    {
+      label: language === 'bn' ? '🤧 সর্দি ও জ্বর' : '🤧 Cold & Fever',
+      query: language === 'bn' ? 'আমার সর্দি ও হালকা জ্বর হয়েছে, ঘরোয়া সমাধান ও নিরাপদ পরামর্শ কী?' : 'I have a cold and mild fever. What safe home remedies are recommended?',
+    },
+    {
+      label: language === 'bn' ? '🤕 মাথা ব্যথা' : '🤕 Headache',
+      query: language === 'bn' ? 'মাথা ব্যথা কমানোর সহজ ও দ্রুত উপায় কী?' : 'How can I relieve a tension headache safely?',
+    },
+    {
+      label: language === 'bn' ? '🔥 গ্যাস্ট্রিক ও এসিডিটি' : '🔥 Acidity & Gas',
+      query: language === 'bn' ? 'গ্যাস্ট্রিক ও বুক জ্বালাপোড়া কমানোর ঘরোয়া উপায় কী?' : 'How to relieve acidity and heartburn quickly?',
+    },
+    {
+      label: language === 'bn' ? '👶 শিশুর যত্ন' : '👶 Baby Care',
+      query: language === 'bn' ? 'শিশুর জ্বর ও প্রাথমিক যত্নের নিয়ম কী?' : 'What is safe fever management guidance for a child?',
+    },
+    {
+      label: language === 'bn' ? '💤 ভালো ঘুম' : '💤 Better Sleep',
+      query: language === 'bn' ? 'রাতে ভালো ও গভীর ঘুমের জন্য কার্যকরী উপায় কী?' : 'What are natural tips for deep, restful sleep?',
+    },
+    {
+      label: language === 'bn' ? '🩺 রক্তচাপ' : '🩺 Blood Pressure',
+      query: language === 'bn' ? 'রক্তচাপ স্বাভাবিক রাখার সহজ উপায় কী?' : 'Lifestyle habits to stabilize blood pressure naturally',
+    },
   ];
 
   const handleSendMessage = async (textToSend) => {
@@ -243,50 +258,54 @@ export const AiHealth = () => {
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
             <div
               style={{
-                width: '42px',
-                height: '42px',
+                width: '40px',
+                height: '40px',
                 borderRadius: 'var(--radius-md)',
                 background: 'linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-teal) 100%)',
                 color: '#ffffff',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
+                boxShadow: '0 4px 12px rgba(0, 168, 150, 0.25)',
+                flexShrink: 0,
               }}
             >
               <Bot size={22} />
             </div>
             <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <h3 style={{ fontSize: '1.15rem', margin: 0 }}>SYNORA AI Health Assistant</h3>
-                <span className="badge badge-teal" style={{ fontSize: '0.68rem' }}>
-                  Safety Guardrails
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+                <h3 style={{ fontSize: '1.1rem', margin: 0, fontWeight: 700 }}>SYNORA AI</h3>
+                <span className="badge badge-teal" style={{ fontSize: '0.65rem', padding: '0.15rem 0.45rem' }}>
+                  ● {language === 'bn' ? 'সক্রিয়' : 'Online'}
                 </span>
               </div>
-              <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                {language === 'bn' ? 'ভয়েস ও টেক্সট সক্রিয় • নিরাপদ পরামর্শ' : 'Voice & Text Enabled • Context-Aware Guidance'}
+              <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+                {language === 'bn' ? 'এআই স্বাস্থ্য সহকারী' : 'AI Health Assistant'}
               </span>
             </div>
           </div>
 
-          <div className="chat-header-actions" style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+          <div className="chat-header-actions" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
             {/* Context Toggle */}
             <button
               type="button"
               className="btn btn-ghost btn-sm"
               onClick={() => setIncludeContext((prev) => !prev)}
-              title="Toggle personalization with your saved Health Profile"
+              title={includeContext ? 'Health profile context active' : 'Health profile context inactive'}
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: '0.4rem',
-                fontSize: '0.82rem',
+                gap: '0.35rem',
+                fontSize: '0.78rem',
                 color: includeContext ? 'var(--brand-primary)' : 'var(--text-muted)',
-                padding: '0.35rem 0.5rem',
+                padding: '0.3rem 0.55rem',
+                borderRadius: 'var(--radius-full)',
+                background: includeContext ? 'var(--brand-primary-light)' : 'transparent',
               }}
             >
-              {includeContext ? <ToggleRight size={20} color="var(--brand-primary)" /> : <ToggleLeft size={20} />}
+              {includeContext ? <ToggleRight size={18} color="var(--brand-primary)" /> : <ToggleLeft size={18} />}
               <span className="chat-context-text">
-                {includeContext ? 'Health Profile Active' : 'Generic Mode'}
+                {includeContext ? (language === 'bn' ? 'প্রোফাইল সক্রিয়' : 'Profile Active') : (language === 'bn' ? 'সাধারণ' : 'Generic')}
               </span>
             </button>
 
@@ -295,10 +314,10 @@ export const AiHealth = () => {
               type="button"
               className="btn btn-secondary btn-sm"
               onClick={() => setShowHistoryDrawer((prev) => !prev)}
-              title="View Chat History"
-              style={{ padding: '0.35rem 0.65rem' }}
+              title={language === 'bn' ? 'হিস্ট্রি দেখুন' : 'View History'}
+              style={{ padding: '0.35rem 0.65rem', fontSize: '0.8rem', gap: '0.35rem' }}
             >
-              <History size={16} />
+              <History size={15} />
               <span>{language === 'bn' ? 'হিস্ট্রি' : 'History'}</span>
             </button>
 
@@ -307,10 +326,10 @@ export const AiHealth = () => {
               type="button"
               className="btn btn-ghost btn-icon"
               onClick={handleClearChat}
-              title="Clear current conversation"
-              style={{ width: '36px', height: '36px' }}
+              title={language === 'bn' ? 'চ্যাট মুছুন' : 'Clear Chat'}
+              style={{ width: '34px', height: '34px' }}
             >
-              <Trash2 size={17} color="var(--status-danger)" />
+              <Trash2 size={16} color="var(--status-danger)" />
             </button>
           </div>
         </div>
@@ -386,11 +405,11 @@ export const AiHealth = () => {
 
                 {/* Suggested Follow-up Questions Chips */}
                 {isAi && msg.followUps && msg.followUps.length > 0 && (
-                  <div style={{ marginTop: '1rem', paddingTop: '0.75rem', borderTop: '1px solid var(--border-subtle)' }}>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '0.4rem', fontWeight: '600' }}>
-                      Suggested Follow-up:
+                  <div style={{ marginTop: '0.85rem', paddingTop: '0.65rem', borderTop: '1px solid var(--border-subtle)' }}>
+                    <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginBottom: '0.35rem', fontWeight: '600' }}>
+                      {language === 'bn' ? 'প্রাসঙ্গিক প্রশ্ন:' : 'Suggested Follow-up:'}
                     </div>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.35rem' }}>
                       {msg.followUps.map((q, idx) => (
                         <button
                           key={idx}
@@ -460,14 +479,15 @@ export const AiHealth = () => {
         <div className="chat-input-area">
           {/* Suggested Starter Chips */}
           <div className="suggested-prompts">
-            {suggestedQuestions.map((prompt, idx) => (
+            {quickTopics.map((item, idx) => (
               <button
                 key={idx}
                 type="button"
                 className="prompt-chip"
-                onClick={() => handleSendMessage(prompt)}
+                onClick={() => handleSendMessage(item.query)}
+                title={item.query}
               >
-                {prompt}
+                {item.label}
               </button>
             ))}
           </div>
@@ -498,8 +518,8 @@ export const AiHealth = () => {
                 }}
                 placeholder={
                   language === 'bn'
-                    ? 'আপনার স্বাস্থ্য প্রশ্ন এখানে লিখুন (Enter চাপলে পাঠানো হবে, Shift+Enter নতুন লাইন)...'
-                    : 'Type your healthcare inquiry (Press Enter to send, Shift+Enter for new line)...'
+                    ? 'স্বাস্থ্য বিষয়ক যেকোনো প্রশ্ন লিখুন...'
+                    : 'Ask any health question...'
                 }
                 disabled={isLoading}
                 aria-label="Health consultation input"
@@ -511,7 +531,7 @@ export const AiHealth = () => {
                 disabled={!inputText.trim() || isLoading}
                 title={t('send')}
               >
-                <Send size={17} />
+                <Send size={16} />
                 <span className="send-btn-label">{t('send')}</span>
               </button>
             </div>
