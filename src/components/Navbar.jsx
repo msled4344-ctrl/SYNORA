@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
+import { SynoraLogo } from './SynoraLogo';
 
 export const Navbar = () => {
   const location = useLocation();
@@ -31,16 +32,7 @@ export const Navbar = () => {
     <header className="header">
       <div className="container header-inner">
         {/* Brand Logo */}
-        <Link to="/" className="logo">
-          <div className="logo-icon">
-            <HeartPulse size={22} strokeWidth={2.5} />
-          </div>
-          <span className="logo-text">
-            <span className="logo-text-syn">SYN</span>
-            <span className="logo-text-accent">ORA</span>
-            <span className="logo-ai-badge">AI</span>
-          </span>
-        </Link>
+        <SynoraLogo size={38} />
 
         {/* Desktop Navigation Links */}
         <nav className="nav-desktop">
