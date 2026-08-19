@@ -2,13 +2,13 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import {
   initialHealthTips,
   initialBabyCare,
-  initialMedicines,
   initialHealthRatings,
   initialSiteSettings,
   generalWeatherGuidelines,
   generalHealthRules,
   medicalDisclaimer,
 } from '../../server/data/seedData.js';
+import synoraMedicineData from '../data/synora_medicine_data.json';
 import { computeSynoraHealthScore } from '../services/healthRatingService';
 
 const HealthDataContext = createContext();
@@ -164,7 +164,15 @@ export const HealthDataProvider = ({ children }) => {
   // 3. Medicines Directory
   const [medicines, setMedicines] = useState(() => {
     const saved = localStorage.getItem('synora_medicines');
-    return saved ? JSON.parse(saved) : initialMedicines;
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (parsed && Array.isArray(parsed) && parsed.length >= 80) return parsed;
+      } catch (e) {
+        // Fallback to dataset
+      }
+    }
+    return synoraMedicineData;
   });
 
   // 4. Health Ratings Configuration
@@ -537,7 +545,7 @@ export const HealthDataProvider = ({ children }) => {
   const resetAllDataToDefault = () => {
     setHealthTips(initialHealthTips);
     setBabyCare(initialBabyCare);
-    setMedicines(initialMedicines);
+    setMedicines(synoraMedicineData);
     setHealthRatings(initialHealthRatings);
     setSiteSettings(initialSiteSettings);
     setPrescriptions(DEFAULT_PRESCRIPTIONS);

@@ -1,144 +1,109 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import {
   Pill,
   Search,
-  Mic,
-  ShieldCheck,
   AlertCircle,
-  Filter,
-  CheckCircle2,
   Sparkles,
   Bot,
-  ArrowRight,
   ScanLine,
+  RotateCcw,
 } from 'lucide-react';
 import { MedicineCard } from '../components/MedicineCard';
 import { VoiceInputButton } from '../components/VoiceInputButton';
 import { PrescriptionScannerModal } from '../components/PrescriptionScannerModal';
-import { useHealthData } from '../context/HealthDataContext';
 import { useLanguage } from '../context/LanguageContext';
-
-const BENGALI_SYNONYMS = {
-  'প্যারাসিটামল': ['paracetamol', 'napa', 'ace', 'fast', 'fever', 'pain'],
-  'নাপা': ['paracetamol', 'napa', 'fever', 'pain'],
-  'এইস': ['paracetamol', 'ace'],
-  'জ্বর': ['paracetamol', 'fever', 'ibuprofen'],
-  'ব্যথা': ['paracetamol', 'ibuprofen', 'pain'],
-  'মাথা ব্যথা': ['paracetamol', 'ibuprofen', 'headache'],
-  'মাথাব্যথা': ['paracetamol', 'ibuprofen', 'headache'],
-  'সেকলো': ['omeprazole', 'seclo'],
-  'লোসেকটিল': ['omeprazole', 'losectil'],
-  'ওমেপ্রাজল': ['omeprazole'],
-  'গ্যাস': ['omeprazole', 'gastrointestinal', 'gastric', 'heartburn'],
-  'গ্যাস্ট্রিক': ['omeprazole', 'gastric', 'heartburn'],
-  'বুক জ্বালা': ['omeprazole', 'heartburn', 'acid'],
-  'অ্যালাট্রোল': ['cetirizine', 'alatrol'],
-  'সেট্রিজিন': ['cetirizine'],
-  'অ্যালার্জি': ['cetirizine', 'allergy'],
-  'সর্দি': ['cetirizine', 'cold', 'rhinitis'],
-  'হাঁচি': ['cetirizine', 'sneezing'],
-  'মক্সাসিল': ['amoxicillin', 'moxacil'],
-  'অ্যামোক্সিসিলিন': ['amoxicillin'],
-  'অ্যান্টিবায়োটিক': ['antibiotics', 'amoxicillin', 'azithromycin'],
-  'জিথ্রিন': ['azithromycin', 'zithrin'],
-  'অ্যাজিথ্রোমাইসিন': ['azithromycin'],
-  'ওরস্যালাইন': ['ors', 'saline', 'orsaline'],
-  'স্যালাইন': ['ors', 'saline'],
-  'ডায়রিয়া': ['ors', 'metronidazole', 'diarrhea'],
-  'বমি': ['ors', 'vomiting'],
-  'পানিশূন্যতা': ['ors', 'dehydration'],
-  'ফ্লাজিল': ['metronidazole', 'flagyl'],
-  'মেট্রোনিডাজল': ['metronidazole'],
-  'আমাশয়': ['metronidazole', 'dysentery'],
-  'ভেন্টোলিন': ['salbutamol', 'ventolin', 'inhaler'],
-  'সালবুটামল': ['salbutamol'],
-  'ইনহেলার': ['salbutamol', 'inhaler', 'asthma'],
-  'হাঁপানি': ['salbutamol', 'montelukast', 'asthma'],
-  'শ্বাসকষ্ট': ['salbutamol', 'montelukast', 'breathing'],
-  'মোনাস': ['montelukast', 'monas'],
-  'মন্টেলুকাস্ট': ['montelukast'],
-  'আইবুপ্রোফেন': ['ibuprofen'],
-  'ফ্লামিম্যাক্স': ['ibuprofen', 'flamimax'],
-};
+import {
+  searchMedicines,
+  getMedicineCategories,
+} from '../services/medicineService';
 
 export const Medicine = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const initialQuery = searchParams.get('q') || '';
+  const initialCategory = searchParams.get('category') || 'All';
 
-  const { medicines } = useHealthData();
-  const { language, t } = useLanguage();
+  const { language } = useLanguage();
 
   const [searchTerm, setSearchTerm] = useState(initialQuery);
-  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [selectedCategory, setSelectedCategory] = useState(initialCategory);
   const [showScannerModal, setShowScannerModal] = useState(false);
 
+  // Synchronize with URL search parameters
   useEffect(() => {
-    if (initialQuery) {
+    if (initialQuery !== searchTerm) {
       setSearchTerm(initialQuery);
     }
   }, [initialQuery]);
 
-  const categories = [
-    'All',
-    'Fever & Pain',
-    'Gastrointestinal',
-    'Allergy & Cold',
-    'Antibiotics',
-    'Respiratory',
-    'Emergency & First Aid',
-    'Chronic Care',
-  ];
-
-  const query = searchTerm.toLowerCase().trim();
-
-  // Find synonym expansions if query has Bengali tokens
-  let expandedQueries = [query];
-  if (query) {
-    for (const [bnKey, enTerms] of Object.entries(BENGALI_SYNONYMS)) {
-      if (query.includes(bnKey.toLowerCase()) || bnKey.toLowerCase().includes(query)) {
-        expandedQueries.push(...enTerms);
-      }
+  useEffect(() => {
+    if (initialCategory && initialCategory !== selectedCategory) {
+      setSelectedCategory(initialCategory);
     }
-  }
+  }, [initialCategory]);
 
-  // Filtering medicines
-  const filteredMedicines = medicines.filter((med) => {
-    const matchesCategory =
-      selectedCategory === 'All' ||
-      med.category?.toLowerCase() === selectedCategory.toLowerCase();
+  // Categories extracted dynamically from dataset
+  const categories = useMemo(() => getMedicineCategories(), []);
 
-    if (!query) return matchesCategory;
+  // Filtered and ranked medicines dynamically computed via clean medicine data layer
+  const filteredMedicines = useMemo(() => {
+    return searchMedicines({
+      query: searchTerm,
+      category: selectedCategory,
+    });
+  }, [searchTerm, selectedCategory]);
 
-    const medString = [
-      med.name,
-      med.genericName,
-      ...(med.brandNames || []),
-      med.purpose,
-      med.indications,
-      med.category,
-      med.therapeuticClass,
-      ...(med.dosageForms || []),
-    ].join(' ').toLowerCase();
+  const handleSearchChange = (val) => {
+    setSearchTerm(val);
+    const newParams = {};
+    if (val.trim()) newParams.q = val.trim();
+    if (selectedCategory !== 'All') newParams.category = selectedCategory;
+    setSearchParams(newParams);
+  };
 
-    const matchesQuery = expandedQueries.some((q) => medString.includes(q));
+  const handleCategorySelect = (cat) => {
+    setSelectedCategory(cat);
+    const newParams = {};
+    if (searchTerm.trim()) newParams.q = searchTerm.trim();
+    if (cat !== 'All') newParams.category = cat;
+    setSearchParams(newParams);
+  };
 
-    return matchesCategory && matchesQuery;
-  });
+  const handleClearSearch = () => {
+    setSearchTerm('');
+    const newParams = {};
+    if (selectedCategory !== 'All') newParams.category = selectedCategory;
+    setSearchParams(newParams);
+  };
+
+  const handleResetFilters = () => {
+    setSearchTerm('');
+    setSelectedCategory('All');
+    setSearchParams({});
+  };
 
   const handleVoiceSearch = (transcript) => {
-    setSearchTerm(transcript);
-    setSearchParams({ q: transcript });
+    if (transcript) {
+      setSearchTerm(transcript);
+      const newParams = { q: transcript };
+      if (selectedCategory !== 'All') newParams.category = selectedCategory;
+      setSearchParams(newParams);
+    }
   };
 
   return (
     <div className="section" style={{ paddingTop: '2rem' }}>
       <div className="container">
         {/* Page Header */}
-        <div className="section-header" style={{ marginBottom: '2.5rem' }}>
+        <div className="section-header" style={{ marginBottom: '2.5rem', textAlign: 'center' }}>
           <h1 className="section-title">
             {language === 'bn' ? 'ওষুধ তথ্য ও নিরাপত্তা নির্দেশিকা' : 'Medicine Information & Safety Guide'}
           </h1>
+          <p className="section-subtitle" style={{ maxWidth: '650px', margin: '0.5rem auto 0 auto', color: 'var(--text-muted)' }}>
+            {language === 'bn'
+              ? 'বাংলাদেশের জেনেরিক ও ব্র্যান্ড ওষুধের সঠিক তথ্য, ব্যবহার ও চিকিৎসাগত নিরাপত্তা নির্দেশিকা জানুন।'
+              : 'Search verified medicine records, popular brand names, safety guidelines, and clinical indications.'}
+          </p>
         </div>
 
         {/* Search & Prescription Scanner Bar */}
@@ -146,7 +111,7 @@ export const Medicine = () => {
           className="card card-glass medicine-search-container"
           style={{
             maxWidth: '780px',
-            margin: '0 auto 2.5rem auto',
+            margin: '0 auto 2rem auto',
             padding: '0.85rem 1.15rem',
             borderRadius: 'var(--radius-xl)',
             boxShadow: 'var(--shadow-lg)',
@@ -177,6 +142,7 @@ export const Medicine = () => {
 
             <input
               type="text"
+              id="medicine-search-input"
               className="form-input"
               style={{
                 border: 'none',
@@ -188,24 +154,19 @@ export const Medicine = () => {
               }}
               placeholder={
                 language === 'bn'
-                  ? 'ওষুধ বা জেনেরিক নাম লিখুন (যেমন: Napa, Paracetamol, Losectil)...'
-                  : 'Search by Brand or Generic (e.g. Paracetamol, Napa, Omeprazole)...'
+                  ? 'ওষুধ বা জেনেরিক নাম লিখুন (যেমন: Napa, Paracetamol, Losectil, গ্যাস, জ্বর)...'
+                  : 'Search by Generic or Brand (e.g. Paracetamol, Napa, Omeprazole, fever, gas)...'
               }
               value={searchTerm}
-              onChange={(e) => {
-                setSearchTerm(e.target.value);
-                setSearchParams(e.target.value ? { q: e.target.value } : {});
-              }}
+              onChange={(e) => handleSearchChange(e.target.value)}
             />
 
             {searchTerm && (
               <button
                 type="button"
                 className="btn-ghost btn-icon"
-                onClick={() => {
-                  setSearchTerm('');
-                  setSearchParams({});
-                }}
+                onClick={handleClearSearch}
+                aria-label="Clear search query"
                 style={{ width: '32px', height: '32px', flexShrink: 0 }}
               >
                 ✕
@@ -226,11 +187,13 @@ export const Medicine = () => {
           onClose={() => setShowScannerModal(false)}
           onSearchMedicine={(medQuery) => {
             setSearchTerm(medQuery);
-            setSearchParams({ q: medQuery });
+            const newParams = { q: medQuery };
+            if (selectedCategory !== 'All') newParams.category = selectedCategory;
+            setSearchParams(newParams);
           }}
         />
 
-        {/* Category Filter Pills */}
+        {/* Dynamic Category Filter Pills */}
         <div
           className="medicine-category-pills"
           style={{
@@ -238,7 +201,7 @@ export const Medicine = () => {
             gap: '0.45rem',
             overflowX: 'auto',
             paddingBottom: '0.75rem',
-            marginBottom: '1.75rem',
+            marginBottom: '1.5rem',
             justifyContent: 'flex-start',
             scrollbarWidth: 'none',
             WebkitOverflowScrolling: 'touch',
@@ -250,9 +213,15 @@ export const Medicine = () => {
               <button
                 key={cat}
                 type="button"
-                onClick={() => setSelectedCategory(cat)}
+                onClick={() => handleCategorySelect(cat)}
                 className={`btn btn-sm ${isSelected ? 'btn-primary' : 'btn-secondary'}`}
-                style={{ borderRadius: 'var(--radius-full)', whiteSpace: 'nowrap', flexShrink: 0 }}
+                style={{
+                  borderRadius: 'var(--radius-full)',
+                  whiteSpace: 'nowrap',
+                  flexShrink: 0,
+                  fontSize: '0.85rem',
+                  padding: '0.4rem 0.9rem',
+                }}
               >
                 {cat}
               </button>
@@ -260,54 +229,120 @@ export const Medicine = () => {
           })}
         </div>
 
-        {/* Results Info Count */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '1.5rem', fontSize: '0.9rem', color: 'var(--text-muted)' }}>
-          <span>
-            Showing <strong>{filteredMedicines.length}</strong> verified medicines
+        {/* Dynamic Medicine Counter & Info Bar */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            gap: '0.5rem',
+            marginBottom: '1.5rem',
+            fontSize: '0.9rem',
+            color: 'var(--text-muted)',
+          }}
+        >
+          <span id="medicine-results-count">
+            {language === 'bn' ? (
+              <>
+                <strong>{filteredMedicines.length}</strong>টি যাচাইকৃত ওষুধ প্রদর্শিত হচ্ছে
+              </>
+            ) : (
+              <>
+                Showing <strong>{filteredMedicines.length}</strong> {filteredMedicines.length === 1 ? 'medicine' : 'medicines'}
+              </>
+            )}
+            {(searchTerm || selectedCategory !== 'All') && (
+              <span style={{ marginLeft: '0.5rem', fontSize: '0.82rem', color: 'var(--brand-primary)' }}>
+                ({selectedCategory !== 'All' ? selectedCategory : ''}{searchTerm ? (selectedCategory !== 'All' ? ` • "${searchTerm}"` : `"${searchTerm}"`) : ''})
+              </span>
+            )}
           </span>
-          <span style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-            <Sparkles size={14} color="var(--brand-primary)" />
-            <span>Updated Daily</span>
-          </span>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            {(searchTerm || selectedCategory !== 'All') && (
+              <button
+                type="button"
+                onClick={handleResetFilters}
+                className="btn-ghost"
+                style={{
+                  fontSize: '0.82rem',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.3rem',
+                  padding: '0.2rem 0.5rem',
+                  color: 'var(--text-secondary)',
+                }}
+              >
+                <RotateCcw size={13} />
+                <span>{language === 'bn' ? 'ফিল্টার রিসেট' : 'Reset Filters'}</span>
+              </button>
+            )}
+
+            <span style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+              <Sparkles size={14} color="var(--brand-primary)" />
+              <span>{language === 'bn' ? 'যাচাইকৃত ডাটাবেজ' : 'Verified Dataset'}</span>
+            </span>
+          </div>
         </div>
 
-        {/* Medicine Grid */}
+        {/* Medicine Cards Grid or Professional Empty State */}
         {filteredMedicines.length === 0 ? (
           <div
             className="card"
             style={{
               textAlign: 'center',
-              padding: '3rem 2rem',
-              maxWidth: '600px',
+              padding: '3.5rem 2rem',
+              maxWidth: '620px',
               margin: '0 auto',
+              borderRadius: 'var(--radius-xl)',
             }}
           >
-            <AlertCircle size={48} color="var(--status-warning)" style={{ margin: '0 auto 1rem auto' }} />
-            <h3 style={{ marginBottom: '0.6rem', fontSize: '1.25rem' }}>
-              {language === 'bn' ? 'ডাটাবেজে তথ্য খুঁজে পাওয়া যায়নি' : 'No Database Record Found'}
+            <AlertCircle
+              size={52}
+              color="var(--status-warning)"
+              style={{ margin: '0 auto 1rem auto', opacity: 0.9 }}
+            />
+            <h3 style={{ marginBottom: '0.6rem', fontSize: '1.3rem', fontWeight: '700' }}>
+              {language === 'bn' ? 'কোনো ওষুধ পাওয়া যায়নি' : 'No medicine found'}
             </h3>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', marginBottom: '1.75rem', lineHeight: '1.6' }}>
+            <p
+              style={{
+                color: 'var(--text-secondary)',
+                fontSize: '0.96rem',
+                marginBottom: '1.75rem',
+                lineHeight: '1.6',
+              }}
+            >
               {language === 'bn' ? (
                 <>
-                  দুঃখিত, আমাদের ডাটাবেজে "<strong>{searchTerm || selectedCategory}</strong>" সম্পর্কিত কোনো ওষুধের রেকর্ড খুঁজে পাওয়া যায়নি। অনুগ্রহ করে সঠিক নাম বা জেনেরিক উপাদান দিয়ে আবার চেষ্টা করুন।
+                  জেনেরিক নাম, ব্র্যান্ডের নাম বা উপসর্গের নাম দিয়ে আবার অনুসন্ধান করুন।
+                  {searchTerm && (
+                    <span style={{ display: 'block', marginTop: '0.35rem', color: 'var(--text-muted)' }}>
+                      অনুসন্ধান টার্ম: "<strong>{searchTerm}</strong>"
+                    </span>
+                  )}
                 </>
               ) : (
                 <>
-                  Sorry, we could not find verified medicine records matching "<strong>{searchTerm || selectedCategory}</strong>" in our database. Please check the spelling or search by generic ingredient.
+                  Try searching by generic name, brand name, or condition.
+                  {searchTerm && (
+                    <span style={{ display: 'block', marginTop: '0.35rem', color: 'var(--text-muted)' }}>
+                      Search query: "<strong>{searchTerm}</strong>"
+                    </span>
+                  )}
                 </>
               )}
             </p>
+
             <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center', flexWrap: 'wrap' }}>
               <button
                 type="button"
                 className="btn btn-secondary btn-sm"
-                onClick={() => {
-                  setSearchTerm('');
-                  setSelectedCategory('All');
-                  setSearchParams({});
-                }}
+                onClick={handleResetFilters}
               >
-                {language === 'bn' ? 'সব ওষুধ দেখুন (রিসেট)' : 'View All Medicines (Reset)'}
+                <RotateCcw size={15} />
+                <span>{language === 'bn' ? 'সব ওষুধ দেখুন (রিসেট)' : 'View All Medicines (Reset)'}</span>
               </button>
 
               {searchTerm && (
@@ -316,7 +351,11 @@ export const Medicine = () => {
                   className="btn btn-primary btn-sm"
                 >
                   <Bot size={16} />
-                  <span>{language === 'bn' ? `সিনোরা এআই-কে জিজ্ঞাসা করুন` : `Ask SYNORA AI Assistant`}</span>
+                  <span>
+                    {language === 'bn'
+                      ? `সিনোরা এআই-কে জিজ্ঞাসা করুন`
+                      : `Ask SYNORA AI Assistant`}
+                  </span>
                 </Link>
               )}
             </div>
@@ -325,7 +364,7 @@ export const Medicine = () => {
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 290px), 1fr))',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 300px), 1fr))',
               gap: 'clamp(1rem, 2vw, 1.5rem)',
             }}
           >
