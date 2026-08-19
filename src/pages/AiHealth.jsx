@@ -26,9 +26,7 @@ import { useLanguage } from '../context/LanguageContext';
 const getWelcomeMessage = (lang) => ({
   id: 'msg-welcome',
   sender: 'ai',
-  text: lang === 'bn'
-    ? '**স্বাগতম!** 👋\nআজ আপনার স্বাস্থ্য বা লক্ষণ সম্পর্কে কোনো প্রশ্ন থাকলে লিখুন।'
-    : '**Welcome!** 👋\nHow can I assist with your health or symptoms today?',
+  text: 'Welcome',
   timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
   followUps: [],
 });

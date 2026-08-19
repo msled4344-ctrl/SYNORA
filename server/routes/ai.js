@@ -261,6 +261,9 @@ ${contextNotes.length > 0 ? `*Context considered: ${contextNotes.join(' | ')}*\n
 // POST /api/ai/chat
 aiRouter.post('/chat', async (req, res) => {
   try {
+    // Dynamically reload .env to ensure fresh API keys without requiring server restart
+    dotenv.config({ override: true });
+
     const { message, context = {}, history = [] } = req.body;
 
     if (!message || typeof message !== 'string' || !message.trim()) {
@@ -337,56 +340,83 @@ Communication Guidelines:
           content: trimmedMessage,
         });
 
-        const openRouterResponse = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${openRouterApiKey}`,
-            'HTTP-Referer': 'https://synora.health',
-            'X-Title': 'SYNORA AI Health Companion',
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            model: openRouterModel,
-            messages: apiMessages,
-            temperature: 0.3,
-            max_tokens: 1500,
-          }),
-        });
+        const candidateModels = [
+          openRouterModel,
+          'google/gemini-2.5-flash',
+          'google/gemini-2.0-flash-001',
+        ].filter((m, i, arr) => arr.indexOf(m) === i);
 
-        if (openRouterResponse.ok) {
-          const data = await openRouterResponse.json();
-          const generatedText = data.choices?.[0]?.message?.content;
-          if (generatedText) {
-            const isBangla = isBanglaQuery;
-            const followUps = isBangla
-              ? [
-                  'এই লক্ষণগুলো কয়দিন ধরে হচ্ছে?',
-                  'আপনার কি অন্য কোনো ক্রনিক রোগ বা অ্যালার্জি আছে?',
-                  'কোন ঘরোয়া উপায়গুলো এখন সবচেয়ে নিরাপদ?',
-                ]
-              : [
-                  'How long have you been experiencing these symptoms?',
-                  'Are you taking any daily medications or have known allergies?',
-                  'What safe self-care steps are recommended right now?',
-                ];
+        let generatedText = null;
+        let usedModel = openRouterModel;
 
-            return res.json({
-              reply: generatedText,
-              followUps,
-              safetyLevel: 'standard',
-              provider: 'openrouter',
-              model: openRouterModel,
-              disclaimer: isBangla
-                ? 'সিনোরা এআই একটি স্বাস্থ্য তথ্য ও শিক্ষা সহায়িকা। এটি চিকিৎসকের সরাসরি প্রেসক্রিপশনের বিকল্প নয়।'
-                : 'SYNORA AI is an informational wellness companion, not a substitute for professional medical advice.',
+        for (const modelToTry of candidateModels) {
+          try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 25000);
+
+            const openRouterResponse = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+              method: 'POST',
+              headers: {
+                'Authorization': `Bearer ${openRouterApiKey}`,
+                'HTTP-Referer': 'https://synora.health',
+                'X-Title': 'SYNORA AI Health Companion',
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                model: modelToTry,
+                messages: apiMessages,
+                temperature: 0.3,
+                max_tokens: 1500,
+              }),
+              signal: controller.signal,
             });
+
+            clearTimeout(timeoutId);
+
+            if (openRouterResponse.ok) {
+              const data = await openRouterResponse.json();
+              const text = data.choices?.[0]?.message?.content;
+              if (text && text.trim()) {
+                generatedText = text.trim();
+                usedModel = modelToTry;
+                break;
+              }
+            } else {
+              const errData = await openRouterResponse.json().catch(() => ({}));
+              console.warn(`OpenRouter model ${modelToTry} returned ${openRouterResponse.status}:`, errData);
+            }
+          } catch (fetchErr) {
+            console.warn(`OpenRouter attempt with ${modelToTry} failed:`, fetchErr.message);
           }
-        } else {
-          const errData = await openRouterResponse.json().catch(() => ({}));
-          console.warn('OpenRouter API returned non-200 response:', openRouterResponse.status, errData);
+        }
+
+        if (generatedText) {
+          const isBangla = isBanglaQuery;
+          const followUps = isBangla
+            ? [
+                'এই লক্ষণগুলো কয়দিন ধরে হচ্ছে?',
+                'আপনার কি অন্য কোনো ক্রনিক রোগ বা অ্যালার্জি আছে?',
+                'কোন ঘরোয়া উপায়গুলো এখন সবচেয়ে নিরাপদ?',
+              ]
+            : [
+                'How long have you been experiencing these symptoms?',
+                'Are you taking any daily medications or have known allergies?',
+                'What safe self-care steps are recommended right now?',
+              ];
+
+          return res.json({
+            reply: generatedText,
+            followUps,
+            safetyLevel: 'standard',
+            provider: 'openrouter',
+            model: usedModel,
+            disclaimer: isBangla
+              ? 'সিনোরা এআই একটি স্বাস্থ্য তথ্য ও শিক্ষা সহায়িকা। এটি চিকিৎসকের সরাসরি প্রেসক্রিপশনের বিকল্প নয়।'
+              : 'SYNORA AI is an informational wellness companion, not a substitute for professional medical advice.',
+          });
         }
       } catch (openRouterErr) {
-        console.warn('OpenRouter API call failed, falling back:', openRouterErr.message);
+        console.warn('OpenRouter API call processing failed, falling back:', openRouterErr.message);
       }
     }
 
