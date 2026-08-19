@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Lock, Mail, ArrowRight, ShieldCheck, AlertCircle } from 'lucide-react';
+import { HeartPulse, Lock, Mail, ArrowRight, ShieldCheck, AlertCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
-import { SynoraLogo } from '../components/SynoraLogo';
 
 export const Login = () => {
   const navigate = useNavigate();
@@ -58,9 +57,16 @@ export const Login = () => {
         <div className="card" style={{ padding: '2.5rem', borderRadius: 'var(--radius-xl)', boxShadow: 'var(--shadow-xl)' }}>
           {/* Logo Header */}
           <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-            <div style={{ display: 'inline-flex', justifyContent: 'center', marginBottom: '0.75rem' }}>
-              <SynoraLogo size={42} />
-            </div>
+            <Link to="/" className="logo" style={{ display: 'inline-flex', marginBottom: '0.75rem' }}>
+              <div className="logo-icon">
+                <HeartPulse size={22} strokeWidth={2.5} />
+              </div>
+              <span className="logo-text">
+                <span className="logo-text-syn">SYN</span>
+                <span className="logo-text-accent">ORA</span>
+                <span className="logo-ai-badge">AI</span>
+              </span>
+            </Link>
             <h2 style={{ fontSize: '1.6rem', marginBottom: '0.3rem' }}>
               {language === 'bn' ? 'লগইন করুন' : 'Welcome Back'}
             </h2>

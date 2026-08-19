@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import {
+  HeartPulse,
   ShieldCheck,
   PhoneCall,
   Mail,
@@ -8,7 +9,6 @@ import {
 } from 'lucide-react';
 import { useHealthData } from '../context/HealthDataContext';
 import { useLanguage } from '../context/LanguageContext';
-import { SynoraLogo } from './SynoraLogo';
 
 export const Footer = () => {
   const { siteSettings } = useHealthData();
@@ -20,9 +20,16 @@ export const Footer = () => {
         <div className="footer-grid">
           {/* Brand Col */}
           <div>
-            <div style={{ marginBottom: '1rem' }}>
-              <SynoraLogo size={38} />
-            </div>
+            <Link to="/" className="logo" style={{ marginBottom: '1rem', display: 'inline-flex' }}>
+              <div className="logo-icon">
+                <HeartPulse size={22} strokeWidth={2.5} />
+              </div>
+              <span className="logo-text">
+                <span className="logo-text-syn">SYN</span>
+                <span className="logo-text-accent">ORA</span>
+                <span className="logo-ai-badge">AI</span>
+              </span>
+            </Link>
             <p style={{ fontSize: '0.92rem', color: 'var(--text-muted)', marginBottom: '1.25rem', maxWidth: '340px' }}>
               {language === 'bn'
                 ? 'সাধারণ মানুষের জন্য সহজ, নিরাপদ ও নির্ভরযোগ্য ডিজিটাল স্বাস্থ্য প্ল্যাটফর্ম ও এআই হেলথ অ্যাসিস্ট্যান্ট।'
