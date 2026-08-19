@@ -73,24 +73,6 @@ export const BabyCareViewer = ({ initialAgeId = '1m', onAddBabyClick }) => {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-      {/* Medical Safety Banner */}
-      <div
-        style={{
-          background: 'var(--brand-primary-light)',
-          border: '1px solid rgba(0, 168, 150, 0.3)',
-          borderRadius: 'var(--radius-lg)',
-          padding: '1rem 1.25rem',
-          display: 'flex',
-          alignItems: 'flex-start',
-          gap: '0.75rem',
-        }}
-      >
-        <Info size={20} color="var(--brand-primary)" style={{ flexShrink: 0, marginTop: '2px' }} />
-        <div style={{ fontSize: '0.88rem', color: 'var(--text-primary)', lineHeight: '1.6' }}>
-          <strong>Pediatric Safety Rule:</strong> {medicalDisclaimer || 'This content is for general health education only. It must not replace diagnosis or treatment by a qualified pediatrician. If a child has serious symptoms, parents/caregivers should seek medical care immediately.'}
-        </div>
-      </div>
-
       {/* Baby Profiles Quick Switch Bar (Multi-baby support) */}
       <div
         className="card card-glass"

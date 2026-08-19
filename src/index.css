@@ -1625,220 +1625,6 @@ img, svg {
 }
 
 /* ==========================================================================
-   Modern Minimalist Profile & Team Strip (Compact & Responsive)
-   ========================================================================== */
-
-.team-profile-strip {
-  margin: 1.25rem 0 2rem 0;
-  padding: 0.55rem 0.85rem;
-  background: var(--bg-card);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
-  display: grid;
-  grid-template-columns: 1.3fr 1fr 1fr;
-  gap: 0.85rem;
-  align-items: center;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
-  transition: all var(--transition-normal);
-}
-
-[data-theme='dark'] .team-profile-strip {
-  background: rgba(19, 32, 64, 0.65);
-  border-color: var(--border-subtle);
-}
-
-.team-profile-strip:hover {
-  border-color: var(--border-strong);
-}
-
-.team-profile-item {
-  display: flex;
-  align-items: center;
-  gap: 0.65rem;
-  min-width: 0;
-  padding: 0.25rem 0.4rem;
-  position: relative;
-}
-
-/* Subtle separator between items on desktop */
-.team-profile-item:not(:last-child)::after {
-  content: '';
-  position: absolute;
-  right: -0.45rem;
-  top: 15%;
-  height: 70%;
-  width: 1px;
-  background: var(--border-subtle);
-}
-
-.team-profile-avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-blue) 100%);
-  color: #ffffff;
-  font-family: var(--font-display);
-  font-size: 0.78rem;
-  font-weight: 800;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  letter-spacing: 0.02em;
-  border: 1.5px solid rgba(255, 255, 255, 0.4);
-}
-
-[data-theme='dark'] .team-profile-avatar {
-  border-color: rgba(255, 255, 255, 0.15);
-}
-
-.team-avatar-lead {
-  background: linear-gradient(135deg, #00a896 0%, #2563eb 100%);
-}
-
-.team-avatar-idea {
-  background: linear-gradient(135deg, #ec4899 0%, #a855f7 100%);
-}
-
-.team-avatar-design {
-  background: linear-gradient(135deg, #06b6d4 0%, #2563eb 100%);
-}
-
-.team-profile-info {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-  flex: 1;
-  gap: 0.1rem;
-}
-
-.team-profile-name-row {
-  display: flex;
-  align-items: center;
-  gap: 0.35rem;
-  flex-wrap: nowrap;
-  white-space: nowrap;
-}
-
-.team-profile-name {
-  font-size: 0.88rem;
-  font-weight: 700;
-  color: var(--text-primary);
-  letter-spacing: -0.01em;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.team-profile-verified {
-  color: var(--brand-primary);
-  flex-shrink: 0;
-  display: inline-flex;
-  align-items: center;
-}
-
-.team-profile-role {
-  font-size: 0.65rem;
-  font-weight: 600;
-  color: var(--brand-primary);
-  background: var(--brand-primary-light);
-  padding: 0.06rem 0.38rem;
-  border-radius: var(--radius-full);
-  white-space: nowrap;
-  flex-shrink: 0;
-  line-height: 1.3;
-}
-
-.role-pill-lead {
-  color: var(--brand-primary);
-  background: var(--brand-primary-light);
-}
-
-[data-theme='dark'] .role-pill-lead {
-  color: var(--brand-primary);
-  background: rgba(0, 210, 188, 0.12);
-}
-
-.role-pill-idea-subtle {
-  color: #db2777;
-  background: rgba(236, 72, 153, 0.1);
-}
-
-[data-theme='dark'] .role-pill-idea-subtle {
-  color: #f472b6;
-  background: rgba(236, 72, 153, 0.18);
-}
-
-.role-pill-design-subtle {
-  color: #0284c7;
-  background: rgba(2, 132, 199, 0.1);
-}
-
-[data-theme='dark'] .role-pill-design-subtle {
-  color: #38bdf8;
-  background: rgba(2, 132, 199, 0.18);
-}
-
-.team-profile-sub {
-  font-size: 0.72rem;
-  color: var(--text-muted);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.team-profile-actions {
-  display: flex;
-  align-items: center;
-  gap: 0.35rem;
-  flex-shrink: 0;
-  margin-left: auto;
-}
-
-.team-icon-btn {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: var(--bg-tertiary);
-  border: 1px solid var(--border-subtle);
-  color: var(--text-muted);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  text-decoration: none;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  flex-shrink: 0;
-}
-
-.team-icon-btn:hover {
-  transform: translateY(-2px);
-}
-
-.team-icon-btn.team-icon-phone:hover {
-  background: var(--brand-primary-light);
-  color: var(--brand-primary);
-  border-color: var(--brand-primary);
-}
-
-.team-icon-btn.team-icon-whatsapp:hover {
-  background: rgba(34, 197, 94, 0.12);
-  color: #16a34a;
-  border-color: #22c55e;
-}
-
-.team-icon-btn.team-icon-email:hover {
-  background: var(--brand-blue-light);
-  color: #2563eb;
-  border-color: #3b82f6;
-}
-
-.team-icon-btn.team-icon-facebook:hover {
-  background: rgba(24, 119, 242, 0.12);
-  color: #1877f2;
-  border-color: #1877f2;
-}
-
-/* ==========================================================================
    Dynamic Health Recommendations Showcase (Alert vs Normal Mode)
    ========================================================================== */
 
@@ -2487,12 +2273,6 @@ img, svg {
     grid-template-columns: repeat(2, 1fr);
     gap: 2.5rem;
   }
-
-  .team-profile-strip {
-    grid-template-columns: 1.2fr 1fr 1fr;
-    gap: 0.65rem;
-    padding: 0.5rem 0.75rem;
-  }
 }
 
 /* 4. Mobile & Portrait Tablets (<= 768px) */
@@ -2643,7 +2423,7 @@ img, svg {
     padding: 0.3rem 0.65rem;
   }
 
-  /* Footer & Team Showcase */
+  /* Footer */
   .footer {
     padding-top: 3rem;
     padding-bottom: calc(var(--taskbar-height) + var(--safe-bottom) + 3rem);
@@ -2658,26 +2438,6 @@ img, svg {
     flex-direction: column;
     gap: 1rem;
     text-align: center;
-  }
-
-  .team-profile-strip {
-    grid-template-columns: 1fr;
-    gap: 0.5rem;
-    padding: 0.6rem 0.75rem;
-  }
-
-  .team-profile-item {
-    padding: 0.25rem 0;
-    gap: 0.6rem;
-  }
-
-  .team-profile-item:not(:last-child)::after {
-    display: none;
-  }
-
-  .team-profile-item:not(:last-child) {
-    border-bottom: 1px solid var(--border-subtle);
-    padding-bottom: 0.5rem;
   }
 }
 
@@ -2727,44 +2487,6 @@ img, svg {
     font-size: 0.95rem;
     width: 100%;
     justify-content: center;
-  }
-
-  /* Team Profile Strip on Compact Phones */
-  .team-profile-strip {
-    padding: 0.5rem 0.65rem;
-  }
-
-  .team-profile-item {
-    gap: 0.5rem;
-  }
-
-  .team-profile-avatar {
-    width: 28px;
-    height: 28px;
-    font-size: 0.72rem;
-  }
-
-  .team-profile-name {
-    font-size: 0.84rem;
-  }
-
-  .team-profile-role {
-    font-size: 0.6rem;
-    padding: 0.04rem 0.32rem;
-  }
-
-  .team-profile-sub {
-    font-size: 0.68rem;
-  }
-
-  .team-icon-btn {
-    width: 26px;
-    height: 26px;
-  }
-
-  .team-icon-btn svg {
-    width: 13px;
-    height: 13px;
   }
 
   /* Taskbar on compact phones */

@@ -139,11 +139,6 @@ export const Medicine = () => {
           <h1 className="section-title">
             {language === 'bn' ? 'ওষুধ তথ্য ও নিরাপত্তা নির্দেশিকা' : 'Medicine Information & Safety Guide'}
           </h1>
-          <p className="section-desc">
-            {language === 'bn'
-              ? 'ব্র্যান্ড নাম বা জেনেরিক নাম লিখে সঠিক ব্যবহার, সেবন সতর্কতা, সাধারণ পার্শ্বপ্রতিক্রিয়া ও ডাক্তারের পরামর্শের নিয়ম জানুন।'
-              : 'Search clinical precautions, generic formulations, standard indications, and dosage warnings.'}
-          </p>
         </div>
 
         {/* Search & Prescription Scanner Bar */}

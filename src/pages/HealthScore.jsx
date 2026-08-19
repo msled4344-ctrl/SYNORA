@@ -36,30 +36,6 @@ export const HealthScore = () => {
           <h1 className="section-title">
             {language === 'bn' ? 'আপনার সিনোরা হেলথ স্কোর ও পরামর্শ' : 'Your Personal SYNORA Health Status'}
           </h1>
-          <p className="section-desc">
-            {language === 'bn'
-              ? 'আপনার রক্তচাপ, উচ্চতা-ওজন (BMI), ঘুম ও দৈনন্দিন অভ্যাসের ভিত্তিতে সাধারণ সুস্থতা স্কোর ও নিয়মিত স্বাস্থ্য নির্দেশনা।'
-              : 'An informational wellness indicator calculated from your vitals, lifestyle metrics, and reported health history.'}
-          </p>
-        </div>
-
-        {/* Informational Disclaimer Alert */}
-        <div
-          style={{
-            background: 'var(--brand-primary-light)',
-            border: '1px solid rgba(0, 168, 150, 0.25)',
-            borderRadius: 'var(--radius-lg)',
-            padding: '1rem 1.5rem',
-            marginBottom: '2.5rem',
-            display: 'flex',
-            alignItems: 'flex-start',
-            gap: '0.75rem',
-          }}
-        >
-          <ShieldCheck size={22} color="var(--brand-primary)" style={{ flexShrink: 0, marginTop: '2px' }} />
-          <div style={{ fontSize: '0.9rem', color: 'var(--text-primary)' }}>
-            <strong>Wellness Indicator Notice:</strong> The SYNORA Health Score is an educational lifestyle metric designed to encourage preventive care. It is <strong>NOT a clinical medical diagnosis</strong> or a guarantee of health status.
-          </div>
         </div>
 
         {/* Main Grid: Left Gauge, Right Recommendations */}
