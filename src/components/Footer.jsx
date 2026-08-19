@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { useHealthData } from '../context/HealthDataContext';
 import { useLanguage } from '../context/LanguageContext';
+import { DeveloperSection } from './DeveloperSection';
 
 export const Footer = () => {
   const { siteSettings } = useHealthData();
@@ -17,6 +18,12 @@ export const Footer = () => {
   return (
     <footer className="footer">
       <div className="container">
+        {/* Developer & Engineering Showcase Section (Top) */}
+        <DeveloperSection />
+
+        <div className="footer-top-divider" />
+
+        {/* Footer Navigation & Info Grid */}
         <div className="footer-grid">
           {/* Brand Col */}
           <div>
@@ -147,3 +154,4 @@ export const Footer = () => {
     </footer>
   );
 };
+
