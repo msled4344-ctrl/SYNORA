@@ -23,12 +23,171 @@ import { useAuth } from '../context/AuthContext';
 import { useHealthData } from '../context/HealthDataContext';
 import { useLanguage } from '../context/LanguageContext';
 
+// Helper component to format Markdown text (bold, lists, headers) into clean HTML
+const FormattedMessage = ({ content }) => {
+  if (!content) return null;
+
+  const lines = content.split('\n');
+  const elements = [];
+  let currentList = [];
+  let listType = null; // 'ul' | 'ol'
+
+  const flushList = () => {
+    if (currentList.length > 0) {
+      if (listType === 'ol') {
+        elements.push(
+          <ol key={`ol-${elements.length}`} style={{ paddingLeft: '1.25rem', margin: '0.4rem 0' }}>
+            {currentList.map((item, idx) => (
+              <li key={idx} style={{ marginBottom: '0.25rem' }}>{renderInline(item)}</li>
+            ))}
+          </ol>
+        );
+      } else {
+        elements.push(
+          <ul key={`ul-${elements.length}`} style={{ paddingLeft: '1.25rem', margin: '0.4rem 0' }}>
+            {currentList.map((item, idx) => (
+              <li key={idx} style={{ marginBottom: '0.25rem' }}>{renderInline(item)}</li>
+            ))}
+          </ul>
+        );
+      }
+      currentList = [];
+      listType = null;
+    }
+  };
+
+  const renderInline = (str) => {
+    if (!str) return '';
+    const parts = [];
+    const regex = /(\*\*.*?\*\*|\*.*?\*)/g;
+    let lastIdx = 0;
+    let match;
+    let key = 0;
+
+    while ((match = regex.exec(str)) !== null) {
+      if (match.index > lastIdx) {
+        parts.push(str.substring(lastIdx, match.index));
+      }
+      const raw = match[0];
+      if (raw.startsWith('**') && raw.endsWith('**')) {
+        parts.push(
+          <strong key={key++} style={{ fontWeight: 650, color: 'inherit' }}>
+            {raw.slice(2, -2)}
+          </strong>
+        );
+      } else if (raw.startsWith('*') && raw.endsWith('*')) {
+        parts.push(
+          <em key={key++} style={{ fontStyle: 'italic' }}>
+            {raw.slice(1, -1)}
+          </em>
+        );
+      }
+      lastIdx = regex.lastIndex;
+    }
+    if (lastIdx < str.length) {
+      parts.push(str.substring(lastIdx));
+    }
+    return parts.length > 0 ? parts : str;
+  };
+
+  lines.forEach((line, index) => {
+    const trimmed = line.trim();
+    if (!trimmed) {
+      flushList();
+      elements.push(<div key={`space-${index}`} style={{ height: '0.4rem' }} />);
+      return;
+    }
+
+    // Heading ###
+    if (trimmed.startsWith('### ')) {
+      flushList();
+      elements.push(
+        <h4
+          key={`h4-${index}`}
+          style={{
+            fontSize: '0.98rem',
+            fontWeight: 700,
+            margin: '0.65rem 0 0.35rem',
+            color: 'var(--brand-primary)',
+          }}
+        >
+          {renderInline(trimmed.replace(/^###\s+/, ''))}
+        </h4>
+      );
+      return;
+    }
+
+    // Heading ##
+    if (trimmed.startsWith('## ')) {
+      flushList();
+      elements.push(
+        <h3
+          key={`h3-${index}`}
+          style={{
+            fontSize: '1.08rem',
+            fontWeight: 700,
+            margin: '0.75rem 0 0.4rem',
+            color: 'var(--brand-primary)',
+          }}
+        >
+          {renderInline(trimmed.replace(/^##\s+/, ''))}
+        </h3>
+      );
+      return;
+    }
+
+    // Bullet point: * or -
+    const bulletMatch = trimmed.match(/^[\*\-]\s+(.+)/);
+    if (bulletMatch) {
+      if (listType !== 'ul') flushList();
+      listType = 'ul';
+      currentList.push(bulletMatch[1]);
+      return;
+    }
+
+    // Numbered list: 1. 2.
+    const numMatch = trimmed.match(/^(\d+)\.\s+(.+)/);
+    if (numMatch) {
+      if (listType !== 'ol') flushList();
+      listType = 'ol';
+      currentList.push(numMatch[2]);
+      return;
+    }
+
+    flushList();
+    elements.push(
+      <p key={`p-${index}`} style={{ margin: '0.25rem 0', lineHeight: '1.65' }}>
+        {renderInline(trimmed)}
+      </p>
+    );
+  });
+
+  flushList();
+  return <div className="formatted-ai-response">{elements}</div>;
+};
+
 const getWelcomeMessage = (lang) => ({
   id: 'msg-welcome',
   sender: 'ai',
-  text: 'Welcome',
+  text:
+    lang === 'bn'
+      ? 'হ্যালো! আমি সিনোরা এআই (SYNORA AI), আপনার সার্বক্ষণিক ডিজিটাল স্বাস্থ্য ও চিকিৎসা তথ্য সহকারী।\n\nআপনি শারীরিক কোনো লক্ষণ, নিরাপদ ঘরোয়া প্রতিকার, ওষুধ সম্পর্কিত তথ্য, কিংবা স্বাস্থ্য ও শিশুর যত্ন নিয়ে যেকোনো প্রশ্ন করতে পারেন। আজ আপনাকে কীভাবে সাহায্য করতে পারি?'
+      : 'Hello! I am SYNORA AI, your intelligent personal health and wellness companion.\n\nYou can ask me any questions regarding symptoms, safe home care, medicine guidance, healthy habits, or baby care. How can I help you today?',
   timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-  followUps: [],
+  followUps:
+    lang === 'bn'
+      ? [
+          'সর্দি ও জ্বরে নিরাপদ ঘরোয়া পরামর্শ কী?',
+          'গ্যাস্ট্রিক ও বুক জ্বালাপোড়া কমানোর উপায়',
+          'মাথা ব্যথা কমানোর সহজ উপায়',
+          'শিশুর জ্বরে করণীয় কী?',
+        ]
+      : [
+          'What is safe guidance for cold and fever?',
+          'How to relieve acidity and heartburn quickly?',
+          'Safe ways to relieve a tension headache',
+          'What should I do if my baby has a fever?',
+        ],
 });
 
 export const AiHealth = () => {
@@ -90,27 +249,45 @@ export const AiHealth = () => {
   const quickTopics = [
     {
       label: language === 'bn' ? '🤧 সর্দি ও জ্বর' : '🤧 Cold & Fever',
-      query: language === 'bn' ? 'আমার সর্দি ও হালকা জ্বর হয়েছে, ঘরোয়া সমাধান ও নিরাপদ পরামর্শ কী?' : 'I have a cold and mild fever. What safe home remedies are recommended?',
+      query:
+        language === 'bn'
+          ? 'আমার সর্দি ও হালকা জ্বর হয়েছে, ঘরোয়া সমাধান ও নিরাপদ পরামর্শ কী?'
+          : 'I have a cold and mild fever. What safe home remedies are recommended?',
     },
     {
       label: language === 'bn' ? '🤕 মাথা ব্যথা' : '🤕 Headache',
-      query: language === 'bn' ? 'মাথা ব্যথা কমানোর সহজ ও দ্রুত উপায় কী?' : 'How can I relieve a tension headache safely?',
+      query:
+        language === 'bn'
+          ? 'মাথা ব্যথা কমানোর সহজ ও দ্রুত উপায় কী?'
+          : 'How can I relieve a tension headache safely?',
     },
     {
       label: language === 'bn' ? '🔥 গ্যাস্ট্রিক ও এসিডিটি' : '🔥 Acidity & Gas',
-      query: language === 'bn' ? 'গ্যাস্ট্রিক ও বুক জ্বালাপোড়া কমানোর ঘরোয়া উপায় কী?' : 'How to relieve acidity and heartburn quickly?',
+      query:
+        language === 'bn'
+          ? 'গ্যাস্ট্রিক ও বুক জ্বালাপোড়া কমানোর ঘরোয়া উপায় কী?'
+          : 'How to relieve acidity and heartburn quickly?',
     },
     {
       label: language === 'bn' ? '👶 শিশুর যত্ন' : '👶 Baby Care',
-      query: language === 'bn' ? 'শিশুর জ্বর ও প্রাথমিক যত্নের নিয়ম কী?' : 'What is safe fever management guidance for a child?',
+      query:
+        language === 'bn'
+          ? 'শিশুর জ্বর ও প্রাথমিক যত্নের নিয়ম কী?'
+          : 'What is safe fever management guidance for a child?',
     },
     {
       label: language === 'bn' ? '💤 ভালো ঘুম' : '💤 Better Sleep',
-      query: language === 'bn' ? 'রাতে ভালো ও গভীর ঘুমের জন্য কার্যকরী উপায় কী?' : 'What are natural tips for deep, restful sleep?',
+      query:
+        language === 'bn'
+          ? 'রাতে ভালো ও গভীর ঘুমের জন্য কার্যকরী উপায় কী?'
+          : 'What are natural tips for deep, restful sleep?',
     },
     {
       label: language === 'bn' ? '🩺 রক্তচাপ' : '🩺 Blood Pressure',
-      query: language === 'bn' ? 'রক্তচাপ স্বাভাবিক রাখার সহজ উপায় কী?' : 'Lifestyle habits to stabilize blood pressure naturally',
+      query:
+        language === 'bn'
+          ? 'রক্তচাপ স্বাভাবিক রাখার সহজ উপায় কী?'
+          : 'Lifestyle habits to stabilize blood pressure naturally',
     },
   ];
 
@@ -131,18 +308,27 @@ export const AiHealth = () => {
 
     try {
       // Build context payload if enabled
-      const contextPayload = includeContext && healthProfile
-        ? {
-            age: healthProfile.age,
-            conditions: healthProfile.conditions,
-            allergies: healthProfile.allergies,
-            bp: `${healthProfile.bpSystolic}/${healthProfile.bpDiastolic}`,
-            smoking: healthProfile.smoking,
-          }
-        : {};
+      const contextPayload =
+        includeContext && healthProfile
+          ? {
+              age: healthProfile.age,
+              conditions: healthProfile.conditions,
+              allergies: healthProfile.allergies,
+              bp: `${healthProfile.bpSystolic}/${healthProfile.bpDiastolic}`,
+              smoking: healthProfile.smoking,
+            }
+          : {};
 
+      // Filter out welcome and previous error messages from history payload
       const historyPayload = messages
-        .filter((m) => !m.id?.startsWith('msg-welcome') && m.text)
+        .filter(
+          (m) =>
+            !m.id?.startsWith('msg-welcome') &&
+            !m.id?.startsWith('ai-err') &&
+            m.text &&
+            !m.text.includes('communication error') &&
+            !m.text.includes('Unable to reach')
+        )
         .slice(-8)
         .map((m) => ({
           role: m.sender === 'ai' ? 'assistant' : 'user',
@@ -165,13 +351,16 @@ export const AiHealth = () => {
 
       if (res.ok) {
         const data = await res.json();
-        aiResponseText = data.reply;
+        aiResponseText = data.reply || (language === 'bn' ? 'কোনো তথ্য পাওয়া যায়নি।' : 'No response returned.');
         followUps = data.followUps || [];
         isEmergency = data.isEmergency || false;
       } else {
-        aiResponseText = language === 'bn'
-          ? 'দুঃখিত, সংযোগে সাময়িক ত্রুটি হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।'
-          : 'Sorry, there was a temporary communication error. Please try again.';
+        const errData = await res.json().catch(() => ({}));
+        aiResponseText =
+          errData.error ||
+          (language === 'bn'
+            ? 'দুঃখিত, সংযোগে সাময়িক ত্রুটি হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।'
+            : 'Sorry, there was a temporary communication error with the health engine. Please try again.');
       }
 
       const aiMessage = {
@@ -191,7 +380,6 @@ export const AiHealth = () => {
         messageCount: messages.length + 2,
         messages: [...messages, userMessage, aiMessage],
       });
-
     } catch (err) {
       console.error('AI chat error:', err);
       setMessages((prev) => [
@@ -199,7 +387,10 @@ export const AiHealth = () => {
         {
           id: `ai-err-${Date.now()}`,
           sender: 'ai',
-          text: 'Unable to reach the healthcare intelligence engine. Please ensure your network is connected.',
+          text:
+            language === 'bn'
+              ? 'স্বাস্থ্য এআই সার্ভারের সাথে সংযোগ স্থাপন করা সম্ভব হয়নি। অনুগ্রহ করে ইন্টারনেট সংযোগ পরীক্ষা করে পুনরায় চেষ্টা করুন।'
+              : 'Unable to reach the healthcare intelligence engine. Please ensure your network is connected and try again.',
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         },
       ]);
@@ -211,12 +402,16 @@ export const AiHealth = () => {
   useEffect(() => {
     if (initialQuery && initialQuery.trim()) {
       handleSendMessage(initialQuery.trim());
+      // Clean query parameter after consumption
+      setSearchParams({}, { replace: true });
     }
   }, [initialQuery]);
 
   const handleVoiceTranscript = (transcriptText) => {
-    setInputText(transcriptText);
-    handleSendMessage(transcriptText);
+    if (transcriptText && transcriptText.trim()) {
+      setInputText(transcriptText);
+      handleSendMessage(transcriptText);
+    }
   };
 
   const handleToggleSpeak = (msgId, text) => {
@@ -392,13 +587,8 @@ export const AiHealth = () => {
                 )}
 
                 {/* Message Body */}
-                <div
-                  style={{
-                    whiteSpace: 'pre-wrap',
-                    lineHeight: '1.65',
-                  }}
-                >
-                  {msg.text}
+                <div style={{ lineHeight: '1.65' }}>
+                  {isAi ? <FormattedMessage content={msg.text} /> : msg.text}
                 </div>
 
                 {/* Suggested Follow-up Questions Chips */}
@@ -439,7 +629,7 @@ export const AiHealth = () => {
 
           {/* Typing / Thinking indicator */}
           {isLoading && (
-            <div className="message-bubble message-ai" style={{ width: '120px' }}>
+            <div className="message-bubble message-ai" style={{ width: '130px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                 <span
                   style={{
@@ -468,6 +658,7 @@ export const AiHealth = () => {
                     animation: 'wave 0.8s infinite alternate 0.4s',
                   }}
                 ></span>
+                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginLeft: '4px' }}>Thinking...</span>
               </div>
             </div>
           )}

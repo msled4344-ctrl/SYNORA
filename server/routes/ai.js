@@ -26,11 +26,20 @@ function generateClinicalResponse(query, userContext = {}) {
   const q = query.toLowerCase();
   const isBanglaOrBanglish = /[\u0980-\u09FF]|(sordi|kashi|jor|betha|matha|pet|bomi|khabar|ami|amar|ki|korbo|khabo|lagche|hochhe|oshudh)/i.test(query);
   
-  // Extract context if present
+  // Extract context if present safely
   const contextNotes = [];
   if (userContext.age) contextNotes.push(`Age: ${userContext.age} yrs`);
-  if (userContext.conditions && userContext.conditions.length > 0) contextNotes.push(`Known conditions: ${userContext.conditions.join(', ')}`);
-  if (userContext.allergies && userContext.allergies.length > 0) contextNotes.push(`Allergies: ${userContext.allergies.join(', ')}`);
+  
+  const conditionsStr = Array.isArray(userContext.conditions)
+    ? userContext.conditions.join(', ')
+    : (typeof userContext.conditions === 'string' && userContext.conditions.trim() ? userContext.conditions.trim() : '');
+  if (conditionsStr) contextNotes.push(`Known conditions: ${conditionsStr}`);
+
+  const allergiesStr = Array.isArray(userContext.allergies)
+    ? userContext.allergies.join(', ')
+    : (typeof userContext.allergies === 'string' && userContext.allergies.trim() ? userContext.allergies.trim() : '');
+  if (allergiesStr) contextNotes.push(`Allergies: ${allergiesStr}`);
+
   if (userContext.bp) contextNotes.push(`BP: ${userContext.bp}`);
 
   // 1. Cold, Flu & Sordi / Kashi
@@ -307,10 +316,10 @@ The symptoms you mentioned (such as severe chest pain, breathing difficulty, sig
 
         const systemPrompt = `You are SYNORA, an empathetic, concise, and clinically safe digital AI health companion.
 Communication Guidelines:
-1. Concise & Structured: Keep responses compact, easy to read on mobile or desktop. Avoid unnecessary filler or lengthy introductions.
+1. Concise & Structured: Keep responses compact, clear, and easy to read on mobile or desktop. Avoid unnecessary filler or lengthy introductions.
 2. Language:
    - If user asks in Bengali (বাংলা) or Banglish, reply in warm, natural, fluent Bengali (বাংলা).
-   - If user asks in English, reply in crisp, clear English.
+   - If user asks in English, reply in crisp, clear, and supportive English.
 3. Response Format:
    - Short 1-sentence assessment.
    - 📌 **ঘরোয়া যত্ন / Key Actions** (3-4 concise bullet points).
@@ -319,7 +328,7 @@ Communication Guidelines:
 4. Safety: Never pretend to be a physical physician, never prescribe prescription-only medications or dangerous dosages.
 5. User Context: ${JSON.stringify(context)}`;
 
-        // Build messages payload including multi-turn history
+        // Build messages payload including multi-turn history (excluding client errors)
         const apiMessages = [
           { role: 'system', content: systemPrompt },
         ];
@@ -327,10 +336,19 @@ Communication Guidelines:
         if (Array.isArray(history) && history.length > 0) {
           for (const item of history.slice(-8)) {
             if (item && item.content && typeof item.content === 'string') {
-              apiMessages.push({
-                role: item.role === 'ai' || item.role === 'assistant' ? 'assistant' : 'user',
-                content: item.content.slice(0, 1500),
-              });
+              const contentTrimmed = item.content.trim();
+              // Skip error messages from history
+              if (
+                contentTrimmed &&
+                !contentTrimmed.includes('communication error') &&
+                !contentTrimmed.includes('Unable to reach') &&
+                !contentTrimmed.includes('সংযোগের সমস্যা')
+              ) {
+                apiMessages.push({
+                  role: item.role === 'ai' || item.role === 'assistant' ? 'assistant' : 'user',
+                  content: contentTrimmed.slice(0, 1500),
+                });
+              }
             }
           }
         }
@@ -340,11 +358,14 @@ Communication Guidelines:
           content: trimmedMessage,
         });
 
+        // Tested and verified active OpenRouter models
         const candidateModels = [
           openRouterModel,
           'google/gemini-2.5-flash',
-          'google/gemini-2.0-flash-001',
-        ].filter((m, i, arr) => arr.indexOf(m) === i);
+          'google/gemini-2.5-flash-lite',
+          'google/gemini-3.5-flash-lite',
+          'deepseek/deepseek-chat',
+        ].filter((m, i, arr) => arr.indexOf(m) === i && typeof m === 'string' && m.trim());
 
         let generatedText = null;
         let usedModel = openRouterModel;
@@ -375,15 +396,26 @@ Communication Guidelines:
 
             if (openRouterResponse.ok) {
               const data = await openRouterResponse.json();
-              const text = data.choices?.[0]?.message?.content;
-              if (text && text.trim()) {
+              let text = data.choices?.[0]?.message?.content;
+              
+              if (Array.isArray(text)) {
+                text = text
+                  .map((chunk) => (typeof chunk === 'string' ? chunk : chunk.text || ''))
+                  .join('');
+              }
+
+              if (!text && data.choices?.[0]?.text) {
+                text = data.choices[0].text;
+              }
+
+              if (text && typeof text === 'string' && text.trim()) {
                 generatedText = text.trim();
                 usedModel = modelToTry;
                 break;
               }
             } else {
               const errData = await openRouterResponse.json().catch(() => ({}));
-              console.warn(`OpenRouter model ${modelToTry} returned ${openRouterResponse.status}:`, errData);
+              console.warn(`OpenRouter model ${modelToTry} returned status ${openRouterResponse.status}:`, errData);
             }
           } catch (fetchErr) {
             console.warn(`OpenRouter attempt with ${modelToTry} failed:`, fetchErr.message);
