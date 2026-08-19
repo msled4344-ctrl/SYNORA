@@ -322,6 +322,10 @@ if (process.env.NODE_ENV === 'production') {
   });
 }
 
-app.listen(PORT, () => {
-  console.log(`SYNORA Health Backend Server running on http://localhost:${PORT}`);
-});
+if (!process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`SYNORA Health Backend Server running on http://localhost:${PORT}`);
+  });
+}
+
+export default app;
