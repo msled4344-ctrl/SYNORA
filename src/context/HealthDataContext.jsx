@@ -59,6 +59,91 @@ const DEFAULT_BABY_PROFILES = [
   }
 ];
 
+const DEFAULT_PRESCRIPTIONS = [
+  {
+    id: 'rx-demo-001',
+    userId: 'synora-user-01',
+    prescriptionImage: 'https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?w=600&auto=format&fit=crop&q=80',
+    patientInfo: {
+      name: 'Rahim Ahmed',
+      age: '28',
+      gender: 'Male',
+      prescriptionDate: '18 August 2026',
+    },
+    doctorInfo: {
+      name: 'Dr. Sharmin Akter',
+      qualification: 'MBBS, FCPS (Medicine)',
+      specialization: 'Internal Medicine Specialist',
+      hospital: 'Square Hospital, Dhaka',
+      contact: '+880 1711-223344',
+    },
+    medicines: [
+      {
+        id: 'rx-med-1',
+        name: 'Napa Extend 665mg',
+        genericName: 'Paracetamol',
+        strength: '665mg',
+        form: 'Tablet',
+        quantity: '10 Tablets',
+        frequency: '1+0+1',
+        timing: 'Morning & Night',
+        duration: '5 Days',
+        instructions: 'Take after meal for mild fever & body ache',
+        mealInstruction: 'After Food',
+      },
+      {
+        id: 'rx-med-2',
+        name: 'Seclo 20mg',
+        genericName: 'Omeprazole',
+        strength: '20mg',
+        form: 'Capsule',
+        quantity: '14 Capsules',
+        frequency: '1+0+1',
+        timing: 'Morning & Evening',
+        duration: '7 Days',
+        instructions: 'Take 30 minutes before breakfast and dinner',
+        mealInstruction: 'Before Food',
+      },
+      {
+        id: 'rx-med-3',
+        name: 'Alatrol 10mg',
+        genericName: 'Cetirizine',
+        strength: '10mg',
+        form: 'Tablet',
+        quantity: '7 Tablets',
+        frequency: '0+0+1',
+        timing: 'Night',
+        duration: '7 Days',
+        instructions: 'Take at bedtime for allergic runny nose',
+        mealInstruction: 'After Food',
+      },
+      {
+        id: 'rx-med-4',
+        name: 'Monas 10mg',
+        genericName: 'Montelukast',
+        strength: '10mg',
+        form: 'Tablet',
+        quantity: '10 Tablets',
+        frequency: '0+0+1',
+        timing: 'Night',
+        duration: '10 Days',
+        instructions: 'Take at night for airway comfort',
+        mealInstruction: 'After Food',
+      }
+    ],
+    diagnosis: 'Acute Upper Respiratory Tract Congestion with Acidity',
+    tests: ['Complete Blood Count (CBC)', 'Serum IgE'],
+    doctorNotes: 'Drink plenty of warm water. Avoid cold drinks, ice, and dusty environments. Practice steam inhalation twice daily.',
+    followUpDate: 'After 7 Days if symptoms persist',
+    unclearItems: [],
+    confidenceNotice: 'AI/OCR-generated interpretation. This is not a replacement for a doctor\'s advice. Always verify with original prescription.',
+    scanDate: '19 August 2026',
+    scanTime: '10:30 PM',
+    createdAt: new Date(Date.now() - 3600000 * 2).toISOString(),
+    updatedAt: new Date(Date.now() - 3600000 * 2).toISOString(),
+  }
+];
+
 export const HealthDataProvider = ({ children }) => {
   // 1. Health Tips
   const [healthTips, setHealthTips] = useState(() => {
@@ -155,6 +240,19 @@ export const HealthDataProvider = ({ children }) => {
     ];
   });
 
+  // 11. Prescriptions History (Isolated per User)
+  const [prescriptions, setPrescriptions] = useState(() => {
+    const saved = localStorage.getItem('synora_user_prescriptions');
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        return DEFAULT_PRESCRIPTIONS;
+      }
+    }
+    return DEFAULT_PRESCRIPTIONS;
+  });
+
   // Persist state updates to localStorage
   useEffect(() => {
     localStorage.setItem('synora_health_tips', JSON.stringify(healthTips));
@@ -195,6 +293,10 @@ export const HealthDataProvider = ({ children }) => {
   useEffect(() => {
     localStorage.setItem('synora_score_history', JSON.stringify(scoreHistory));
   }, [scoreHistory]);
+
+  useEffect(() => {
+    localStorage.setItem('synora_user_prescriptions', JSON.stringify(prescriptions));
+  }, [prescriptions]);
 
   // Try fetching latest data from backend server if available
   useEffect(() => {
@@ -371,6 +473,66 @@ export const HealthDataProvider = ({ children }) => {
     setAiChats([]);
   };
 
+  // Prescription History Management (Isolated per User)
+  const savePrescription = (prescriptionData, userId = 'synora-user-01') => {
+    const now = new Date();
+    const newPrescription = {
+      id: `rx-${Date.now()}`,
+      userId: userId || 'synora-user-01',
+      prescriptionImage: prescriptionData.prescriptionImage || '',
+      patientInfo: prescriptionData.patientInfo || {
+        name: 'Information could not be clearly detected',
+        age: '',
+        gender: '',
+        prescriptionDate: '',
+      },
+      doctorInfo: prescriptionData.doctorInfo || {
+        name: 'Information could not be clearly detected',
+        qualification: '',
+        specialization: '',
+        hospital: '',
+        contact: '',
+      },
+      medicines: Array.isArray(prescriptionData.medicines) ? prescriptionData.medicines : [],
+      diagnosis: prescriptionData.diagnosis || 'Not specified',
+      tests: Array.isArray(prescriptionData.tests) ? prescriptionData.tests : [],
+      doctorNotes: prescriptionData.doctorNotes || '',
+      followUpDate: prescriptionData.followUpDate || '',
+      unclearItems: Array.isArray(prescriptionData.unclearItems) ? prescriptionData.unclearItems : [],
+      confidenceNotice: prescriptionData.confidenceNotice || 'AI/OCR-generated interpretation. This is not a replacement for a doctor\'s advice. Always verify with original prescription.',
+      scanDate: prescriptionData.scanDate || now.toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' }),
+      scanTime: prescriptionData.scanTime || now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }),
+      createdAt: now.toISOString(),
+      updatedAt: now.toISOString(),
+    };
+
+    setPrescriptions((prev) => [newPrescription, ...prev]);
+    return newPrescription;
+  };
+
+  const deletePrescription = (id) => {
+    setPrescriptions((prev) => prev.filter((p) => p.id !== id));
+  };
+
+  const updatePrescription = (id, updatedData) => {
+    setPrescriptions((prev) =>
+      prev.map((p) =>
+        p.id === id
+          ? { ...p, ...updatedData, updatedAt: new Date().toISOString() }
+          : p
+      )
+    );
+  };
+
+  const getPrescriptionById = (id) => {
+    return prescriptions.find((p) => p.id === id) || null;
+  };
+
+  const getUserPrescriptions = (userId) => {
+    if (!userId) return prescriptions;
+    return prescriptions.filter((p) => p.userId === userId || !p.userId);
+  };
+
   // Reset to initial Seed Data
   const resetAllDataToDefault = () => {
     setHealthTips(initialHealthTips);
@@ -378,11 +540,13 @@ export const HealthDataProvider = ({ children }) => {
     setMedicines(initialMedicines);
     setHealthRatings(initialHealthRatings);
     setSiteSettings(initialSiteSettings);
+    setPrescriptions(DEFAULT_PRESCRIPTIONS);
     localStorage.removeItem('synora_health_tips');
     localStorage.removeItem('synora_baby_care');
     localStorage.removeItem('synora_medicines');
     localStorage.removeItem('synora_health_ratings');
     localStorage.removeItem('synora_site_settings');
+    localStorage.removeItem('synora_user_prescriptions');
   };
 
   return (
@@ -400,6 +564,7 @@ export const HealthDataProvider = ({ children }) => {
         setActiveBabyId,
         aiChats,
         scoreHistory,
+        prescriptions,
         generalWeatherGuidelines,
         generalHealthRules,
         medicalDisclaimer,
@@ -423,6 +588,11 @@ export const HealthDataProvider = ({ children }) => {
         saveAiConversation,
         deleteAiConversation,
         clearAllAiChats,
+        savePrescription,
+        deletePrescription,
+        updatePrescription,
+        getPrescriptionById,
+        getUserPrescriptions,
         setSiteSettings,
         resetAllDataToDefault,
       }}

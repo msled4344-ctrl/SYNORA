@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import {
   User,
   Activity,
@@ -16,12 +17,21 @@ import {
   Trash2,
   Edit2,
   Sparkles,
+  FileText,
+  ScanLine,
+  Stethoscope,
+  Pill,
+  Calendar,
+  Clock,
+  Eye,
+  ExternalLink,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useHealthData } from '../context/HealthDataContext';
 import { useTheme } from '../context/ThemeContext';
 import { useLanguage } from '../context/LanguageContext';
 import { calculateBMI, evaluateBloodPressure } from '../services/healthRatingService';
+import { PrescriptionDetailModal } from '../components/PrescriptionDetailModal';
 
 export const Profile = () => {
   const { currentUser, updateProfileData, isAdmin } = useAuth();
@@ -32,15 +42,21 @@ export const Profile = () => {
     deleteBabyProfile,
     aiChats,
     deleteAiConversation,
+    prescriptions,
+    deletePrescription,
+    getUserPrescriptions,
   } = useHealthData();
   const { theme, toggleTheme } = useTheme();
   const { language, t } = useLanguage();
 
-  const [activeTab, setActiveTab] = useState('health'); // health, personal, babies, aichats, settings
+  const [activeTab, setActiveTab] = useState('health'); // health, personal, babies, aichats, prescriptions
   const [formData, setFormData] = useState({ ...healthProfile });
   const [personalName, setPersonalName] = useState(currentUser?.displayName || '');
   const [avatarUrl, setAvatarUrl] = useState(currentUser?.photoURL || '');
   const [saveSuccessMessage, setSaveSuccessMessage] = useState(null);
+  const [selectedPrescription, setSelectedPrescription] = useState(null);
+
+  const userPrescriptions = getUserPrescriptions(currentUser?.uid);
 
   // Live calculations
   const liveBmi = calculateBMI(formData.weightKg, formData.heightCm);
@@ -248,6 +264,19 @@ export const Profile = () => {
           >
             <Baby size={16} />
             <span>My Children ({babyProfiles.length})</span>
+          </button>
+          <button
+            type="button"
+            className={`btn btn-sm ${activeTab === 'prescriptions' ? 'btn-primary' : 'btn-ghost'}`}
+            onClick={() => setActiveTab('prescriptions')}
+            style={{ flexShrink: 0 }}
+          >
+            <FileText size={16} />
+            <span>
+              {language === 'bn'
+                ? `প্রেসক্রিপশন ইতিহাস (${userPrescriptions.length})`
+                : `Prescription History (${userPrescriptions.length})`}
+            </span>
           </button>
           <button
             type="button"
@@ -676,7 +705,280 @@ export const Profile = () => {
             )}
           </div>
         )}
+
+        {/* Tab 5: Prescription History */}
+        {activeTab === 'prescriptions' && (
+          <div className="card" style={{ padding: 'clamp(1.25rem, 3vw, 2rem)' }}>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                marginBottom: '1.5rem',
+                flexWrap: 'wrap',
+                gap: '1rem',
+              }}
+            >
+              <div>
+                <h3 style={{ margin: 0, fontSize: '1.35rem', fontWeight: '700' }}>
+                  {language === 'bn' ? 'সংরক্ষিত প্রেসক্রিপশন ইতিহাস' : 'Scanned Prescription History'}
+                </h3>
+                <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.88rem', color: 'var(--text-muted)' }}>
+                  {language === 'bn'
+                    ? 'আপনার ডিজিটালাইজড প্রেসক্রিপশন, ওষুধের তালিকা ও ডাক্তারের পরামর্শের নিরাপদ আর্কাইভ।'
+                    : 'Personalized archive of extracted medications, dosages, and doctor advice.'}
+                </p>
+              </div>
+
+              <Link
+                to="/medicine"
+                className="btn btn-primary btn-sm"
+                style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}
+              >
+                <ScanLine size={16} />
+                <span>{language === 'bn' ? 'নতুন প্রেসক্রিপশন স্ক্যান' : 'Scan New Prescription'}</span>
+              </Link>
+            </div>
+
+            {userPrescriptions.length === 0 ? (
+              <div
+                style={{
+                  textAlign: 'center',
+                  padding: '3.5rem 1.5rem',
+                  background: 'var(--bg-tertiary)',
+                  borderRadius: 'var(--radius-lg)',
+                  border: '1px dashed var(--border-strong)',
+                }}
+              >
+                <div
+                  style={{
+                    width: '60px',
+                    height: '60px',
+                    borderRadius: '50%',
+                    background: 'var(--brand-primary-light)',
+                    color: 'var(--brand-primary)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    margin: '0 auto 1rem auto',
+                  }}
+                >
+                  <FileText size={28} />
+                </div>
+                <h4 style={{ fontSize: '1.15rem', marginBottom: '0.4rem' }}>
+                  {language === 'bn' ? 'কোনো সংরক্ষিত প্রেসক্রিপশন নেই' : 'No Prescriptions Scanned Yet'}
+                </h4>
+                <p
+                  style={{
+                    color: 'var(--text-secondary)',
+                    fontSize: '0.9rem',
+                    maxWidth: '460px',
+                    margin: '0 auto 1.5rem auto',
+                    lineHeight: '1.6',
+                  }}
+                >
+                  {language === 'bn'
+                    ? 'ওষুধ পেজ থেকে ডাক্তারের প্রেসক্রিপশন স্ক্যান করে আপনার ওষুধের তালিকা, মাত্রা ও সেবন নিয়ম স্বয়ংক্রিয়ভাবে সংরক্ষণ করুন।'
+                    : 'Use our AI Prescription Scanner on the Medicines page to extract and safely store your prescription data.'}
+                </p>
+                <Link to="/medicine" className="btn btn-primary btn-sm">
+                  <ScanLine size={16} />
+                  <span>{language === 'bn' ? 'ওষুধ পেজে যান ও স্ক্যান করুন' : 'Go to Medicine Page & Scan'}</span>
+                </Link>
+              </div>
+            ) : (
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 360px), 1fr))',
+                  gap: '1.25rem',
+                }}
+              >
+                {userPrescriptions.map((rx, idx) => {
+                  const medCount = rx.medicines?.length || 0;
+                  const docName = rx.doctorInfo?.name && rx.doctorInfo.name !== 'Information could not be clearly detected'
+                    ? rx.doctorInfo.name
+                    : null;
+                  const previewMeds = (rx.medicines || [])
+                    .slice(0, 3)
+                    .map((m) => m.name)
+                    .filter((n) => n && n !== 'Information could not be clearly detected');
+
+                  return (
+                    <div
+                      key={rx.id}
+                      className="card"
+                      style={{
+                        background: 'var(--bg-tertiary)',
+                        border: '1px solid var(--border-subtle)',
+                        borderRadius: 'var(--radius-lg)',
+                        padding: '1.25rem',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'space-between',
+                        transition: 'var(--transition-normal)',
+                      }}
+                    >
+                      <div>
+                        {/* Top Header */}
+                        <div
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            marginBottom: '0.75rem',
+                            flexWrap: 'wrap',
+                            gap: '0.5rem',
+                          }}
+                        >
+                          <span
+                            className="badge badge-teal"
+                            style={{ fontWeight: '700', fontSize: '0.78rem' }}
+                          >
+                            Prescription #{String(userPrescriptions.length - idx).padStart(3, '0')}
+                          </span>
+                          <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+                            {rx.scanDate} • {rx.scanTime}
+                          </span>
+                        </div>
+
+                        {/* Doctor Info */}
+                        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem', marginBottom: '0.6rem' }}>
+                          <Stethoscope size={16} color="var(--brand-primary)" style={{ flexShrink: 0, marginTop: '2px' }} />
+                          <div style={{ fontSize: '0.9rem' }}>
+                            <strong>{docName || 'Registered Medical Practitioner'}</strong>
+                            {rx.doctorInfo?.hospital && (
+                              <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                                {rx.doctorInfo.hospital}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Diagnosis / Summary */}
+                        {rx.diagnosis && rx.diagnosis !== 'Not specified' && (
+                          <div
+                            style={{
+                              fontSize: '0.84rem',
+                              color: 'var(--text-secondary)',
+                              marginBottom: '0.75rem',
+                              lineHeight: '1.5',
+                            }}
+                          >
+                            <span style={{ color: 'var(--text-muted)' }}>Condition: </span>
+                            <strong>{rx.diagnosis}</strong>
+                          </div>
+                        )}
+
+                        {/* Medicines Count & Chips */}
+                        <div style={{ marginBottom: '1rem' }}>
+                          <div
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '0.35rem',
+                              fontSize: '0.84rem',
+                              fontWeight: '600',
+                              color: 'var(--brand-primary)',
+                              marginBottom: '0.35rem',
+                            }}
+                          >
+                            <Pill size={14} />
+                            <span>
+                              {language === 'bn'
+                                ? `${medCount}টি ওষুধ নির্ধারিত`
+                                : `${medCount} Prescribed Medicine${medCount > 1 ? 's' : ''}`}
+                            </span>
+                          </div>
+
+                          {previewMeds.length > 0 && (
+                            <div style={{ display: 'flex', gap: '0.35rem', flexWrap: 'wrap' }}>
+                              {previewMeds.map((medName, i) => (
+                                <span
+                                  key={i}
+                                  style={{
+                                    fontSize: '0.75rem',
+                                    background: 'var(--bg-card)',
+                                    padding: '0.15rem 0.5rem',
+                                    borderRadius: 'var(--radius-sm)',
+                                    border: '1px solid var(--border-subtle)',
+                                    color: 'var(--text-secondary)',
+                                  }}
+                                >
+                                  {medName}
+                                </span>
+                              ))}
+                              {medCount > 3 && (
+                                <span
+                                  style={{
+                                    fontSize: '0.75rem',
+                                    color: 'var(--text-muted)',
+                                    padding: '0.15rem 0.35rem',
+                                  }}
+                                >
+                                  +{medCount - 3} more
+                                </span>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Card Action Buttons */}
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          paddingTop: '0.75rem',
+                          borderTop: '1px solid var(--border-subtle)',
+                          marginTop: '0.5rem',
+                        }}
+                      >
+                        <button
+                          type="button"
+                          className="btn btn-primary btn-sm"
+                          onClick={() => setSelectedPrescription(rx)}
+                          style={{ fontSize: '0.82rem' }}
+                        >
+                          <Eye size={14} />
+                          <span>{language === 'bn' ? 'বিস্তারিত দেখুন' : 'View Details'}</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          className="btn btn-ghost btn-sm"
+                          style={{ color: 'var(--status-danger)', fontSize: '0.82rem' }}
+                          onClick={() => {
+                            if (window.confirm(language === 'bn' ? 'প্রেসক্রিপশনটি মুছে ফেলতে চান?' : 'Delete this prescription from your history?')) {
+                              deletePrescription(rx.id);
+                            }
+                          }}
+                          title="Delete"
+                        >
+                          <Trash2 size={15} />
+                          <span>{language === 'bn' ? 'মুছুন' : 'Delete'}</span>
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        )}
       </div>
+
+      {/* Prescription Detail Modal */}
+      <PrescriptionDetailModal
+        prescription={selectedPrescription}
+        isOpen={!!selectedPrescription}
+        onClose={() => setSelectedPrescription(null)}
+        onDelete={(id) => {
+          deletePrescription(id);
+          setSelectedPrescription(null);
+        }}
+      />
     </div>
   );
 };

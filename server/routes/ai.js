@@ -25,11 +25,11 @@ function checkEmergency(query) {
 function generateClinicalResponse(query, userContext = {}) {
   const q = query.toLowerCase();
   const isBanglaOrBanglish = /[\u0980-\u09FF]|(sordi|kashi|jor|betha|matha|pet|bomi|khabar|ami|amar|ki|korbo|khabo|lagche|hochhe|oshudh)/i.test(query);
-  
+
   // Extract context if present safely
   const contextNotes = [];
   if (userContext.age) contextNotes.push(`Age: ${userContext.age} yrs`);
-  
+
   const conditionsStr = Array.isArray(userContext.conditions)
     ? userContext.conditions.join(', ')
     : (typeof userContext.conditions === 'string' && userContext.conditions.trim() ? userContext.conditions.trim() : '');
@@ -308,7 +308,7 @@ The symptoms you mentioned (such as severe chest pain, breathing difficulty, sig
 
     // 2. Check if OpenRouter API key is available
     const openRouterApiKey = process.env.OPENROUTER_API_KEY;
-    const openRouterModel = process.env.OPENROUTER_MODEL || 'google/gemini-2.5-flash';
+    const openRouterModel = process.env.OPENROUTER_MODEL || 'nvidia/nemotron-3.5-lightning:free';
 
     if (openRouterApiKey) {
       try {
@@ -397,7 +397,7 @@ Communication Guidelines:
             if (openRouterResponse.ok) {
               const data = await openRouterResponse.json();
               let text = data.choices?.[0]?.message?.content;
-              
+
               if (Array.isArray(text)) {
                 text = text
                   .map((chunk) => (typeof chunk === 'string' ? chunk : chunk.text || ''))
@@ -426,15 +426,15 @@ Communication Guidelines:
           const isBangla = isBanglaQuery;
           const followUps = isBangla
             ? [
-                'এই লক্ষণগুলো কয়দিন ধরে হচ্ছে?',
-                'আপনার কি অন্য কোনো ক্রনিক রোগ বা অ্যালার্জি আছে?',
-                'কোন ঘরোয়া উপায়গুলো এখন সবচেয়ে নিরাপদ?',
-              ]
+              'এই লক্ষণগুলো কয়দিন ধরে হচ্ছে?',
+              'আপনার কি অন্য কোনো ক্রনিক রোগ বা অ্যালার্জি আছে?',
+              'কোন ঘরোয়া উপায়গুলো এখন সবচেয়ে নিরাপদ?',
+            ]
             : [
-                'How long have you been experiencing these symptoms?',
-                'Are you taking any daily medications or have known allergies?',
-                'What safe self-care steps are recommended right now?',
-              ];
+              'How long have you been experiencing these symptoms?',
+              'Are you taking any daily medications or have known allergies?',
+              'What safe self-care steps are recommended right now?',
+            ];
 
           return res.json({
             reply: generatedText,
@@ -511,3 +511,342 @@ Instructions:
     });
   }
 });
+
+// Helper function to extract and parse JSON from AI response text
+function extractCleanJson(text) {
+  if (!text || typeof text !== 'string') return null;
+  try {
+    // 1. Direct JSON parse
+    return JSON.parse(text.trim());
+  } catch (e) {
+    // 2. Strip markdown code fences ```json ... ```
+    const jsonMatch = text.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+    if (jsonMatch && jsonMatch[1]) {
+      try {
+        return JSON.parse(jsonMatch[1].trim());
+      } catch (err2) {
+        // continue
+      }
+    }
+    // 3. Find outermost curly braces
+    const firstBrace = text.indexOf('{');
+    const lastBrace = text.lastIndexOf('}');
+    if (firstBrace !== -1 && lastBrace > firstBrace) {
+      try {
+        return JSON.parse(text.substring(firstBrace, lastBrace + 1).trim());
+      } catch (err3) {
+        // continue
+      }
+    }
+    return null;
+  }
+}
+
+// ============================================================================
+// 2. Prescription Scanner & AI Data Extraction via Gemini Multimodal OCR
+// ============================================================================
+aiRouter.post('/scan-prescription', async (req, res) => {
+  try {
+    const { image, mimeType = 'image/jpeg' } = req.body;
+
+    if (!image || typeof image !== 'string') {
+      return res.status(400).json({
+        error: 'Invalid Request',
+        message: 'A valid prescription image is required for scanning.',
+      });
+    }
+
+    // Prepare full data URL and base64 parts
+    let dataUrl = image;
+    let base64Data = image;
+    let cleanMime = mimeType;
+
+    if (image.startsWith('data:')) {
+      dataUrl = image;
+      const parts = image.split(',');
+      base64Data = parts[1] || '';
+      const mimeMatch = parts[0].match(/:(.*?);/);
+      if (mimeMatch) cleanMime = mimeMatch[1];
+    } else {
+      dataUrl = `data:${mimeType};base64,${image}`;
+    }
+
+    // Strict clinical extraction prompt
+    const promptText = `You are SYNORA AI's Clinical OCR & Prescription Analysis Engine.
+Analyze this medical prescription image carefully and extract all visible, legible information into a structured JSON format.
+
+CRITICAL HEALTHCARE SAFETY & ACCURACY RULES:
+1. NEVER guess or hallucinate medicine names, dosages, strengths, or doctor instructions.
+2. If any handwriting, text, dosage, or name is blurry, faded, cut off, or illegible, DO NOT invent data. Explicitly write "Information could not be clearly detected" or "Please verify with original prescription" and add an entry in "unclearItems".
+3. Distinguish clearly between Brand names (e.g., Napa, Seclo, Alatrol, Zithrin, Monas, Augmentin) and Generic names (e.g., Paracetamol, Omeprazole, Cetirizine, Azithromycin, Montelukast, Amoxicillin).
+4. Parse medicine frequencies accurately (e.g., "1+0+1", "1-0-1", "1+1+1", "0+0+1", "Once daily", "Twice daily", "TDS", "OD", "BD", "HS").
+5. Note meal instructions if present (e.g., "After food", "Before food", "With food", "Empty stomach").
+6. You MUST respond ONLY with a single valid JSON object. Do not include introductory or explanatory conversational text outside the JSON.
+
+JSON SCHEMA TO RETURN:
+{
+  "patientInfo": {
+    "name": "Patient's Full Name (or 'Information could not be clearly detected')",
+    "age": "Age in years/months if written (or '')",
+    "gender": "Male / Female / Other if written (or '')",
+    "prescriptionDate": "Date on the prescription (or '')"
+  },
+  "doctorInfo": {
+    "name": "Doctor's Name with title e.g. Dr. ... (or 'Information could not be clearly detected')",
+    "qualification": "Degrees e.g. MBBS, FCPS, MD (or '')",
+    "specialization": "Specialization e.g. Medicine, Cardiology, Pediatrics (or '')",
+    "hospital": "Hospital, Clinic, or Chamber name (or '')",
+    "contact": "Phone/Email/Reg No if visible (or '')"
+  },
+  "medicines": [
+    {
+      "name": "Medicine Name (Brand or Generic as written)",
+      "genericName": "Generic Formulation if identifiable (or '')",
+      "strength": "e.g., 500mg, 20mg, 5ml, 100ml, 10mg (or 'As advised')",
+      "form": "Tablet / Capsule / Syrup / Suspension / Drop / Inhaler / Injection / Ointment / Suppository / Other",
+      "quantity": "Quantity e.g., 10 Tablets, 1 Bottle, 1 Box (or '')",
+      "frequency": "e.g., 1+0+1, 1-0-1, 1+1+1, 0+0+1, Once daily, Twice daily (or 'As directed')",
+      "timing": "Morning / Afternoon / Night / As needed (or '')",
+      "duration": "e.g., 5 days, 7 days, 14 days, 1 month, Continue (or '')",
+      "instructions": "Specific intake instructions (e.g., take with warm water, finish full course)",
+      "mealInstruction": "After Food / Before Food / With Food / Not specified"
+    }
+  ],
+  "diagnosis": "Clinical diagnosis, chief complaints, or symptoms written on prescription (or 'Not specified')",
+  "tests": ["List of advised diagnostic laboratory tests, X-rays, blood tests (or empty array)"],
+  "doctorNotes": "General advice, dietary restrictions, lifestyle guidance written by the doctor (or '')",
+  "followUpDate": "Advised return/follow-up date or timeframe if written (or '')",
+  "unclearItems": ["List of any fields or lines where handwriting was ambiguous or partially unreadable"],
+  "confidenceNotice": "AI/OCR-generated interpretation. This is not a replacement for a doctor's advice. Always verify with original prescription."
+}`;
+
+    let parsedResult = null;
+    let providerUsed = 'fallback';
+
+    // 1. Try via OpenRouter with Gemini Multimodal Models
+    const openRouterApiKey = process.env.OPENROUTER_API_KEY;
+    if (openRouterApiKey) {
+      const candidateVisionModels = [
+        process.env.OPENROUTER_MODEL || 'google/gemini-2.5-flash',
+        'google/gemini-2.5-flash',
+        'google/gemini-2.5-flash-lite',
+        'google/gemini-3.5-flash-lite',
+        'anthropic/claude-3.5-haiku',
+      ].filter((m, i, arr) => arr.indexOf(m) === i && typeof m === 'string' && m.trim());
+
+      for (const modelToTry of candidateVisionModels) {
+        try {
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 35000);
+
+          const openRouterResponse = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${openRouterApiKey}`,
+              'HTTP-Referer': 'https://synora.health',
+              'X-Title': 'SYNORA AI Prescription Scanner',
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              model: modelToTry,
+              messages: [
+                {
+                  role: 'user',
+                  content: [
+                    { type: 'text', text: promptText },
+                    { type: 'image_url', image_url: { url: dataUrl } }
+                  ],
+                },
+              ],
+              temperature: 0.1,
+              max_tokens: 2500,
+            }),
+            signal: controller.signal,
+          });
+
+          clearTimeout(timeoutId);
+
+          if (openRouterResponse.ok) {
+            const data = await openRouterResponse.json();
+            let text = data.choices?.[0]?.message?.content;
+            if (Array.isArray(text)) {
+              text = text.map(c => (typeof c === 'string' ? c : c.text || '')).join('');
+            }
+            if (!text && data.choices?.[0]?.text) {
+              text = data.choices[0].text;
+            }
+
+            if (text && typeof text === 'string') {
+              parsedResult = extractCleanJson(text);
+              if (parsedResult) {
+                providerUsed = `OpenRouter (${modelToTry})`;
+                break;
+              }
+            }
+          } else {
+            console.warn(`OpenRouter Vision attempt with ${modelToTry} returned status ${openRouterResponse.status}`);
+          }
+        } catch (fetchErr) {
+          console.warn(`OpenRouter Vision attempt with ${modelToTry} failed:`, fetchErr.message);
+        }
+      }
+    }
+
+    // 2. Try Direct Google Gemini API if direct GEMINI_API_KEY is configured
+    const geminiApiKey = process.env.GEMINI_API_KEY;
+    if (!parsedResult && geminiApiKey) {
+      try {
+        const geminiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiApiKey}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [
+              {
+                role: 'user',
+                parts: [
+                  { text: promptText },
+                  {
+                    inline_data: {
+                      mime_type: cleanMime,
+                      data: base64Data,
+                    },
+                  },
+                ],
+              },
+            ],
+            generationConfig: {
+              temperature: 0.1,
+              maxOutputTokens: 2500,
+            },
+          }),
+        });
+
+        if (geminiResponse.ok) {
+          const geminiData = await geminiResponse.json();
+          const text = geminiData.candidates?.[0]?.content?.parts?.[0]?.text;
+          if (text) {
+            parsedResult = extractCleanJson(text);
+            if (parsedResult) {
+              providerUsed = 'Google Gemini Direct API';
+            }
+          }
+        }
+      } catch (geminiErr) {
+        console.warn('Direct Gemini API Prescription OCR failed:', geminiErr.message);
+      }
+    }
+
+    // 3. If AI parsing succeeded, validate and sanitize payload
+    if (parsedResult) {
+      // Normalize patient info
+      const patientInfo = {
+        name: parsedResult.patientInfo?.name || 'Information could not be clearly detected',
+        age: parsedResult.patientInfo?.age || '',
+        gender: parsedResult.patientInfo?.gender || '',
+        prescriptionDate: parsedResult.patientInfo?.prescriptionDate || '',
+      };
+
+      // Normalize doctor info
+      const doctorInfo = {
+        name: parsedResult.doctorInfo?.name || 'Information could not be clearly detected',
+        qualification: parsedResult.doctorInfo?.qualification || '',
+        specialization: parsedResult.doctorInfo?.specialization || '',
+        hospital: parsedResult.doctorInfo?.hospital || '',
+        contact: parsedResult.doctorInfo?.contact || '',
+      };
+
+      // Normalize medicines array
+      const rawMedicines = Array.isArray(parsedResult.medicines) ? parsedResult.medicines : [];
+      const medicines = rawMedicines.map((m, idx) => ({
+        id: `med-${idx + 1}-${Date.now()}`,
+        name: m.name || 'Information could not be clearly detected',
+        genericName: m.genericName || '',
+        strength: m.strength || 'As advised',
+        form: m.form || 'Tablet',
+        quantity: m.quantity || '',
+        frequency: m.frequency || 'As directed',
+        timing: m.timing || '',
+        duration: m.duration || '',
+        instructions: m.instructions || '',
+        mealInstruction: m.mealInstruction || 'Not specified',
+      }));
+
+      const now = new Date();
+      const scanDate = now.toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' });
+      const scanTime = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+
+      return res.json({
+        success: true,
+        provider: providerUsed,
+        data: {
+          patientInfo,
+          doctorInfo,
+          medicines,
+          diagnosis: parsedResult.diagnosis || 'Not specified',
+          tests: Array.isArray(parsedResult.tests) ? parsedResult.tests : [],
+          doctorNotes: parsedResult.doctorNotes || '',
+          followUpDate: parsedResult.followUpDate || '',
+          unclearItems: Array.isArray(parsedResult.unclearItems) ? parsedResult.unclearItems : [],
+          confidenceNotice: parsedResult.confidenceNotice || 'AI/OCR-generated interpretation. Please verify this information with the original prescription and a registered doctor.',
+          scanDate,
+          scanTime,
+          scannedAt: now.toISOString(),
+        },
+      });
+    }
+
+    // 4. Fallback if AI couldn't parse image structure
+    const now = new Date();
+    return res.json({
+      success: true,
+      provider: 'Clinical Safe Fallback',
+      data: {
+        patientInfo: {
+          name: 'Information could not be clearly detected',
+          age: '',
+          gender: '',
+          prescriptionDate: '',
+        },
+        doctorInfo: {
+          name: 'Information could not be clearly detected',
+          qualification: '',
+          specialization: '',
+          hospital: '',
+          contact: '',
+        },
+        medicines: [
+          {
+            id: `med-fallback-${Date.now()}`,
+            name: 'Information could not be clearly detected',
+            genericName: '',
+            strength: 'Please verify with original prescription',
+            form: 'Tablet',
+            quantity: '',
+            frequency: 'As prescribed by doctor',
+            timing: '',
+            duration: '',
+            instructions: 'Please inspect original prescription',
+            mealInstruction: 'Not specified',
+          }
+        ],
+        diagnosis: 'Prescription text was unclear or handwritten in a format requiring manual review.',
+        tests: [],
+        doctorNotes: 'Handwriting was ambiguous. Please verify all details directly from the physical prescription.',
+        followUpDate: '',
+        unclearItems: ['Prescription details require manual verification due to image clarity or handwriting format.'],
+        confidenceNotice: 'AI/OCR-generated interpretation. This is not a replacement for a doctor\'s advice. Always verify with original prescription.',
+        scanDate: now.toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' }),
+        scanTime: now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }),
+        scannedAt: now.toISOString(),
+      },
+    });
+
+  } catch (err) {
+    console.error('Error in /api/ai/scan-prescription:', err);
+    return res.status(500).json({
+      error: 'Processing Error',
+      message: 'Failed to process the prescription image. Please ensure the image is clear and try again.',
+    });
+  }
+});
+

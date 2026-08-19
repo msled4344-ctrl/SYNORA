@@ -1625,437 +1625,217 @@ img, svg {
 }
 
 /* ==========================================================================
-   Ultra-Premium Creator & Developer Showcase
+   Modern Minimalist Profile & Team Strip (Compact & Responsive)
    ========================================================================== */
 
-.creator-showcase-container {
-  margin: 1.5rem 0 2.5rem 0;
-  padding: 1.6rem 2rem;
-  background: linear-gradient(135deg, rgba(0, 168, 150, 0.05) 0%, rgba(37, 99, 235, 0.04) 50%, rgba(6, 182, 212, 0.03) 100%), var(--bg-card);
-  border: 1px solid rgba(0, 168, 150, 0.22);
-  border-radius: var(--radius-2xl);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 2rem;
-  flex-wrap: wrap;
-  box-shadow: 0 14px 35px -10px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.6);
-  position: relative;
-  overflow: hidden;
-  transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-[data-theme='dark'] .creator-showcase-container {
-  background: linear-gradient(135deg, rgba(0, 168, 150, 0.08) 0%, rgba(37, 99, 235, 0.06) 50%, rgba(15, 23, 42, 0.95) 100%), var(--bg-card);
-  border-color: rgba(0, 168, 150, 0.28);
-  box-shadow: 0 14px 40px -10px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.06);
-}
-
-.creator-showcase-container:hover {
-  border-color: rgba(0, 168, 150, 0.45);
-  box-shadow: 0 18px 45px -10px rgba(0, 168, 150, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.8);
-  transform: translateY(-2px);
-}
-
-.creator-profile-side {
-  display: flex;
-  align-items: center;
-  gap: 1.15rem;
-  flex: 1;
-  min-width: 280px;
-}
-
-.creator-avatar-wrap {
-  position: relative;
-  flex-shrink: 0;
-}
-
-.creator-avatar-monogram {
-  width: 52px;
-  height: 52px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #00a896 0%, #028090 45%, #2563eb 100%);
-  color: #ffffff;
-  font-family: var(--font-display);
-  font-size: 1.25rem;
-  font-weight: 900;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 6px 18px rgba(0, 168, 150, 0.4);
-  border: 2.5px solid rgba(255, 255, 255, 0.8);
-  letter-spacing: 0.02em;
-}
-
-[data-theme='dark'] .creator-avatar-monogram {
-  border-color: rgba(255, 255, 255, 0.2);
-}
-
-.creator-status-dot {
-  position: absolute;
-  bottom: 0px;
-  right: 0px;
-  width: 13px;
-  height: 13px;
-  border-radius: 50%;
-  background: #22c55e;
-  border: 2px solid var(--bg-card);
-  box-shadow: 0 0 8px #22c55e;
-}
-
-.creator-info-text {
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
-}
-
-.creator-role-tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  font-size: 0.74rem;
-  font-weight: 700;
-  color: var(--brand-primary);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-
-.creator-sparkle-icon {
-  color: #06b6d4;
-  animation: sparkleRotate 3s infinite linear;
-}
-
-@keyframes sparkleRotate {
-  0% { transform: scale(0.9) rotate(0deg); }
-  50% { transform: scale(1.15) rotate(180deg); }
-  100% { transform: scale(0.9) rotate(360deg); }
-}
-
-.creator-name-row {
-  display: flex;
-  align-items: center;
-  gap: 0.45rem;
-}
-
-.creator-main-name {
-  font-size: 1.32rem;
-  font-weight: 900;
-  color: var(--text-primary);
-  letter-spacing: -0.02em;
-  margin: 0;
-}
-
-.creator-verified-badge {
-  color: var(--brand-primary);
-  display: inline-flex;
-  align-items: center;
-}
-
-.creator-bio-line {
-  font-size: 0.82rem;
-  color: var(--text-muted);
-  margin: 0;
-  line-height: 1.4;
-}
-
-/* Contact Grid */
-.creator-contact-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(170px, 1fr));
-  gap: 0.75rem;
-  flex-shrink: 0;
-}
-
-.creator-contact-card {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.6rem 0.9rem;
-  background: var(--bg-secondary);
+.team-profile-strip {
+  margin: 1.25rem 0 2rem 0;
+  padding: 0.55rem 0.85rem;
+  background: var(--bg-card);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-lg);
-  text-decoration: none;
-  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-.creator-contact-card:hover {
-  background: var(--bg-card);
-  transform: translateY(-3px);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
-}
-
-.creator-card-phone:hover {
-  border-color: var(--brand-primary);
-  box-shadow: 0 6px 18px rgba(0, 168, 150, 0.18);
-}
-
-.creator-card-email:hover {
-  border-color: #2563eb;
-  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.18);
-}
-
-.creator-card-whatsapp:hover {
-  border-color: #22c55e;
-  box-shadow: 0 6px 18px rgba(34, 197, 94, 0.18);
-}
-
-.creator-card-facebook:hover {
-  border-color: #1877f2;
-  box-shadow: 0 6px 18px rgba(24, 119, 242, 0.18);
-}
-
-.creator-icon-box {
-  width: 36px;
-  height: 36px;
-  border-radius: var(--radius-md);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  transition: transform 0.3s ease;
-}
-
-.creator-contact-card:hover .creator-icon-box {
-  transform: scale(1.1);
-}
-
-.phone-box {
-  background: rgba(0, 168, 150, 0.12);
-  color: var(--brand-primary);
-}
-
-.email-box {
-  background: rgba(37, 99, 235, 0.12);
-  color: #2563eb;
-}
-
-.whatsapp-box {
-  background: rgba(34, 197, 94, 0.12);
-  color: #16a34a;
-}
-
-.facebook-box {
-  background: rgba(24, 119, 242, 0.12);
-  color: #1877f2;
-}
-
-.creator-card-meta {
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
-.creator-card-label {
-  font-size: 0.72rem;
-  font-weight: 600;
-  color: var(--text-muted);
-  line-height: 1.2;
-}
-
-.creator-card-val {
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: var(--text-primary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.creator-link-val {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.25rem;
-  color: #1877f2;
-}
-
-/* ==========================================================================
-   SYNORA Team Showcase & Sub-grid Styles
-   ========================================================================== */
-
-.synora-team-showcase {
-  margin: 1.5rem 0 2.5rem 0;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.synora-team-showcase .creator-showcase-container {
-  margin: 0;
-}
-
-.team-members-subgrid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1rem;
+  grid-template-columns: 1.3fr 1fr 1fr;
+  gap: 0.85rem;
+  align-items: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  transition: all var(--transition-normal);
 }
 
-.team-member-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-xl);
-  padding: 1.25rem 1.4rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  gap: 1.15rem;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
-  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-  position: relative;
-  overflow: hidden;
+[data-theme='dark'] .team-profile-strip {
+  background: rgba(19, 32, 64, 0.65);
+  border-color: var(--border-subtle);
 }
 
-.team-member-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 25px -4px rgba(0, 0, 0, 0.07);
+.team-profile-strip:hover {
+  border-color: var(--border-strong);
 }
 
-.team-card-idea:hover {
-  border-color: rgba(236, 72, 153, 0.4);
-}
-
-.team-card-design:hover {
-  border-color: rgba(6, 182, 212, 0.4);
-}
-
-.team-card-top {
+.team-profile-item {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 0.65rem;
+  min-width: 0;
+  padding: 0.25rem 0.4rem;
+  position: relative;
 }
 
-.team-avatar-wrap {
-  flex-shrink: 0;
+/* Subtle separator between items on desktop */
+.team-profile-item:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  right: -0.45rem;
+  top: 15%;
+  height: 70%;
+  width: 1px;
+  background: var(--border-subtle);
 }
 
-.team-avatar-monogram {
-  width: 44px;
-  height: 44px;
+.team-profile-avatar {
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
+  background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-blue) 100%);
+  color: #ffffff;
   font-family: var(--font-display);
-  font-size: 1.05rem;
-  font-weight: 900;
+  font-size: 0.78rem;
+  font-weight: 800;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #ffffff;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  border: 2px solid rgba(255, 255, 255, 0.8);
+  flex-shrink: 0;
+  letter-spacing: 0.02em;
+  border: 1.5px solid rgba(255, 255, 255, 0.4);
 }
 
-[data-theme='dark'] .team-avatar-monogram {
+[data-theme='dark'] .team-profile-avatar {
   border-color: rgba(255, 255, 255, 0.15);
 }
 
-.monogram-idea {
+.team-avatar-lead {
+  background: linear-gradient(135deg, #00a896 0%, #2563eb 100%);
+}
+
+.team-avatar-idea {
   background: linear-gradient(135deg, #ec4899 0%, #a855f7 100%);
-  box-shadow: 0 4px 14px rgba(236, 72, 153, 0.35);
 }
 
-.monogram-design {
-  background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
-  box-shadow: 0 4px 14px rgba(6, 182, 212, 0.35);
+.team-avatar-design {
+  background: linear-gradient(135deg, #06b6d4 0%, #2563eb 100%);
 }
 
-.team-meta-info {
+.team-profile-info {
   display: flex;
   flex-direction: column;
-  gap: 0.15rem;
   min-width: 0;
+  flex: 1;
+  gap: 0.1rem;
 }
 
-.team-role-pill {
-  display: inline-flex;
+.team-profile-name-row {
+  display: flex;
   align-items: center;
-  gap: 0.3rem;
-  font-size: 0.72rem;
+  gap: 0.35rem;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+}
+
+.team-profile-name {
+  font-size: 0.88rem;
   font-weight: 700;
-  padding: 0.18rem 0.55rem;
-  border-radius: var(--radius-full);
-  width: fit-content;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-  margin-bottom: 0.15rem;
-}
-
-.role-pill-idea {
-  background: rgba(236, 72, 153, 0.12);
-  color: #db2777;
-  border: 1px solid rgba(236, 72, 153, 0.25);
-}
-
-[data-theme='dark'] .role-pill-idea {
-  color: #f472b6;
-  background: rgba(236, 72, 153, 0.2);
-}
-
-.role-pill-design {
-  background: rgba(6, 182, 212, 0.12);
-  color: #0891b2;
-  border: 1px solid rgba(6, 182, 212, 0.25);
-}
-
-[data-theme='dark'] .role-pill-design {
-  color: #38bdf8;
-  background: rgba(6, 182, 212, 0.2);
-}
-
-.team-member-name {
-  font-size: 1.12rem;
-  font-weight: 800;
   color: var(--text-primary);
-  margin: 0;
+  letter-spacing: -0.01em;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.team-member-sub {
-  font-size: 0.78rem;
-  color: var(--text-muted);
-  margin: 0;
+.team-profile-verified {
+  color: var(--brand-primary);
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+}
+
+.team-profile-role {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--brand-primary);
+  background: var(--brand-primary-light);
+  padding: 0.06rem 0.38rem;
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+  flex-shrink: 0;
   line-height: 1.3;
 }
 
-.team-card-actions {
+.role-pill-lead {
+  color: var(--brand-primary);
+  background: var(--brand-primary-light);
+}
+
+[data-theme='dark'] .role-pill-lead {
+  color: var(--brand-primary);
+  background: rgba(0, 210, 188, 0.12);
+}
+
+.role-pill-idea-subtle {
+  color: #db2777;
+  background: rgba(236, 72, 153, 0.1);
+}
+
+[data-theme='dark'] .role-pill-idea-subtle {
+  color: #f472b6;
+  background: rgba(236, 72, 153, 0.18);
+}
+
+.role-pill-design-subtle {
+  color: #0284c7;
+  background: rgba(2, 132, 199, 0.1);
+}
+
+[data-theme='dark'] .role-pill-design-subtle {
+  color: #38bdf8;
+  background: rgba(2, 132, 199, 0.18);
+}
+
+.team-profile-sub {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.team-profile-actions {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
-  flex-wrap: wrap;
+  gap: 0.35rem;
+  flex-shrink: 0;
+  margin-left: auto;
 }
 
-.team-contact-btn {
+.team-icon-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-muted);
   display: inline-flex;
   align-items: center;
-  gap: 0.45rem;
-  padding: 0.42rem 0.75rem;
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
-  color: var(--text-secondary);
-  text-decoration: none;
-  font-size: 0.82rem;
-  font-weight: 600;
-  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
-  flex: 1;
-  min-width: 120px;
   justify-content: center;
+  text-decoration: none;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  flex-shrink: 0;
 }
 
-.team-contact-btn:hover {
+.team-icon-btn:hover {
   transform: translateY(-2px);
-  color: var(--text-primary);
 }
 
-.team-contact-btn.btn-call:hover {
-  border-color: var(--brand-primary);
+.team-icon-btn.team-icon-phone:hover {
   background: var(--brand-primary-light);
   color: var(--brand-primary);
+  border-color: var(--brand-primary);
 }
 
-.team-contact-btn.btn-whatsapp:hover {
-  border-color: #22c55e;
-  background: rgba(34, 197, 94, 0.1);
+.team-icon-btn.team-icon-whatsapp:hover {
+  background: rgba(34, 197, 94, 0.12);
   color: #16a34a;
+  border-color: #22c55e;
+}
+
+.team-icon-btn.team-icon-email:hover {
+  background: var(--brand-blue-light);
+  color: #2563eb;
+  border-color: #3b82f6;
+}
+
+.team-icon-btn.team-icon-facebook:hover {
+  background: rgba(24, 119, 242, 0.12);
+  color: #1877f2;
+  border-color: #1877f2;
 }
 
 /* ==========================================================================
@@ -2708,13 +2488,10 @@ img, svg {
     gap: 2.5rem;
   }
 
-  .creator-showcase-container {
-    padding: 1.5rem 1.75rem;
-    gap: 1.5rem;
-  }
-
-  .creator-contact-grid {
-    grid-template-columns: repeat(2, 1fr);
+  .team-profile-strip {
+    grid-template-columns: 1.2fr 1fr 1fr;
+    gap: 0.65rem;
+    padding: 0.5rem 0.75rem;
   }
 }
 
@@ -2883,27 +2660,24 @@ img, svg {
     text-align: center;
   }
 
-  .creator-showcase-container {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 1.25rem;
-    padding: 1.35rem 1.15rem;
-  }
-
-  .creator-profile-side {
-    width: 100%;
-    min-width: 0;
-  }
-
-  .creator-contact-grid {
-    width: 100%;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.5rem;
-  }
-
-  .team-members-subgrid {
+  .team-profile-strip {
     grid-template-columns: 1fr;
-    gap: 0.85rem;
+    gap: 0.5rem;
+    padding: 0.6rem 0.75rem;
+  }
+
+  .team-profile-item {
+    padding: 0.25rem 0;
+    gap: 0.6rem;
+  }
+
+  .team-profile-item:not(:last-child)::after {
+    display: none;
+  }
+
+  .team-profile-item:not(:last-child) {
+    border-bottom: 1px solid var(--border-subtle);
+    padding-bottom: 0.5rem;
   }
 }
 
@@ -2955,23 +2729,42 @@ img, svg {
     justify-content: center;
   }
 
-  /* Creator Cards */
-  .creator-contact-grid {
-    grid-template-columns: 1fr;
+  /* Team Profile Strip on Compact Phones */
+  .team-profile-strip {
+    padding: 0.5rem 0.65rem;
   }
 
-  .creator-contact-card {
-    padding: 0.65rem 0.85rem;
+  .team-profile-item {
+    gap: 0.5rem;
   }
 
-  .team-card-actions {
-    flex-direction: column;
-    gap: 0.4rem;
+  .team-profile-avatar {
+    width: 28px;
+    height: 28px;
+    font-size: 0.72rem;
   }
 
-  .team-contact-btn {
-    width: 100%;
-    justify-content: center;
+  .team-profile-name {
+    font-size: 0.84rem;
+  }
+
+  .team-profile-role {
+    font-size: 0.6rem;
+    padding: 0.04rem 0.32rem;
+  }
+
+  .team-profile-sub {
+    font-size: 0.68rem;
+  }
+
+  .team-icon-btn {
+    width: 26px;
+    height: 26px;
+  }
+
+  .team-icon-btn svg {
+    width: 13px;
+    height: 13px;
   }
 
   /* Taskbar on compact phones */
@@ -3022,3 +2815,150 @@ img, svg {
     padding: 0.25rem 0.05rem;
   }
 }
+
+/* ==========================================================================
+   Prescription Scanner & AI Extraction Design Enhancements
+   ========================================================================== */
+
+.prescription-scan-trigger-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.btn-prescription-scan {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  background: var(--brand-primary-light);
+  border: 1.5px solid rgba(0, 168, 150, 0.35);
+  color: var(--brand-primary);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  flex-shrink: 0;
+  position: relative;
+  box-shadow: 0 2px 6px rgba(0, 168, 150, 0.12);
+}
+
+.btn-prescription-scan:hover {
+  background: var(--brand-primary);
+  color: #ffffff;
+  border-color: var(--brand-primary);
+  transform: translateY(-1px) scale(1.04);
+  box-shadow: var(--shadow-glow);
+}
+
+.btn-prescription-scan:active {
+  transform: translateY(0) scale(0.97);
+}
+
+.prescription-scan-pulse-dot {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #00f5d4;
+  box-shadow: 0 0 8px #00f5d4;
+  animation: pulseDot 2s infinite ease-in-out;
+}
+
+@keyframes pulseDot {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.4);
+    opacity: 0.6;
+  }
+}
+
+.prescription-scan-tooltip {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  background: var(--brand-navy);
+  color: #ffffff;
+  font-size: 0.76rem;
+  font-weight: 600;
+  white-space: nowrap;
+  padding: 0.35rem 0.75rem;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  z-index: 50;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.prescription-scan-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 5px;
+  border-style: solid;
+  border-color: var(--brand-navy) transparent transparent transparent;
+}
+
+.prescription-scan-trigger-wrapper:hover .prescription-scan-tooltip,
+.prescription-scan-trigger-wrapper:focus-within .prescription-scan-tooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* Dark mode tooltip overrides */
+[data-theme='dark'] .prescription-scan-tooltip {
+  background: #192a54;
+  border-color: rgba(0, 210, 188, 0.3);
+}
+
+[data-theme='dark'] .prescription-scan-tooltip::after {
+  border-color: #192a54 transparent transparent transparent;
+}
+
+/* Aurora mode tooltip overrides */
+[data-theme='aurora'] .prescription-scan-tooltip {
+  background: #141f45;
+  border-color: rgba(0, 245, 212, 0.4);
+}
+
+[data-theme='aurora'] .prescription-scan-tooltip::after {
+  border-color: #141f45 transparent transparent transparent;
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 640px) {
+  .medicine-search-container {
+    padding: 0.65rem 0.85rem !important;
+  }
+
+  .btn-prescription-scan {
+    width: 38px;
+    height: 38px;
+  }
+
+  .btn-prescription-scan svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .prescription-scan-tooltip {
+    display: none; /* Avoid obstructing search on touch devices */
+  }
+}
+

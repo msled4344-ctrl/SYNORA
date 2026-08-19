@@ -11,9 +11,11 @@ import {
   Sparkles,
   Bot,
   ArrowRight,
+  ScanLine,
 } from 'lucide-react';
 import { MedicineCard } from '../components/MedicineCard';
 import { VoiceInputButton } from '../components/VoiceInputButton';
+import { PrescriptionScannerModal } from '../components/PrescriptionScannerModal';
 import { useHealthData } from '../context/HealthDataContext';
 import { useLanguage } from '../context/LanguageContext';
 
@@ -69,6 +71,7 @@ export const Medicine = () => {
 
   const [searchTerm, setSearchTerm] = useState(initialQuery);
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const [showScannerModal, setShowScannerModal] = useState(false);
 
   useEffect(() => {
     if (initialQuery) {
@@ -143,19 +146,40 @@ export const Medicine = () => {
           </p>
         </div>
 
-        {/* Search & Voice Bar */}
+        {/* Search & Prescription Scanner Bar */}
         <div
-          className="card card-glass"
+          className="card card-glass medicine-search-container"
           style={{
             maxWidth: '780px',
             margin: '0 auto 2.5rem auto',
-            padding: '1.25rem',
+            padding: '0.85rem 1.15rem',
             borderRadius: 'var(--radius-xl)',
             boxShadow: 'var(--shadow-lg)',
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <Search size={22} color="var(--brand-primary)" style={{ marginLeft: '0.5rem' }} />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', width: '100%' }}>
+            {/* Prescription Scanner Icon Button on the LEFT side */}
+            <div className="prescription-scan-trigger-wrapper" style={{ position: 'relative' }}>
+              <button
+                type="button"
+                className="btn-prescription-scan"
+                onClick={() => setShowScannerModal(true)}
+                aria-label="Scan Prescription"
+                title={language === 'bn' ? 'প্রেসক্রিপশন স্ক্যান করুন' : 'Scan Prescription'}
+              >
+                <ScanLine size={21} />
+                <span className="prescription-scan-pulse-dot" />
+              </button>
+
+              {/* Tooltip */}
+              <div className="prescription-scan-tooltip">
+                <Sparkles size={13} color="#00f5d4" />
+                <span>{language === 'bn' ? 'প্রেসক্রিপশন স্ক্যান করুন' : 'Scan Prescription'}</span>
+              </div>
+            </div>
+
+            <Search size={22} color="var(--brand-primary)" style={{ flexShrink: 0 }} />
+
             <input
               type="text"
               className="form-input"
@@ -165,11 +189,12 @@ export const Medicine = () => {
                 fontSize: '1.05rem',
                 boxShadow: 'none',
                 padding: '0.6rem 0',
+                flex: 1,
               }}
               placeholder={
                 language === 'bn'
-                  ? 'ওষুধ বা জেনেরিক নাম লিখুন (যেমন: Napa, Paracetamol, Losectil, Flagyl)...'
-                  : 'Search by Brand or Generic (e.g. Paracetamol, Napa, Omeprazole, Cetirizine)...'
+                  ? 'ওষুধ বা জেনেরিক নাম লিখুন (যেমন: Napa, Paracetamol, Losectil)...'
+                  : 'Search by Brand or Generic (e.g. Paracetamol, Napa, Omeprazole)...'
               }
               value={searchTerm}
               onChange={(e) => {
@@ -186,7 +211,7 @@ export const Medicine = () => {
                   setSearchTerm('');
                   setSearchParams({});
                 }}
-                style={{ width: '32px', height: '32px' }}
+                style={{ width: '32px', height: '32px', flexShrink: 0 }}
               >
                 ✕
               </button>
@@ -199,6 +224,16 @@ export const Medicine = () => {
             />
           </div>
         </div>
+
+        {/* Prescription Scanner Modal */}
+        <PrescriptionScannerModal
+          isOpen={showScannerModal}
+          onClose={() => setShowScannerModal(false)}
+          onSearchMedicine={(medQuery) => {
+            setSearchTerm(medQuery);
+            setSearchParams({ q: medQuery });
+          }}
+        />
 
         {/* Category Filter Pills */}
         <div

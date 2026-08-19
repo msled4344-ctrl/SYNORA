@@ -20,9 +20,125 @@ import {
 import { useHealthData } from '../context/HealthDataContext';
 import { useLanguage } from '../context/LanguageContext';
 
+// Modern SVG WhatsApp icon component
+const WhatsAppIcon = ({ size = 14, className = '' }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="currentColor"
+    className={className}
+    style={{ display: 'inline-block', verticalAlign: 'middle' }}
+    aria-hidden="true"
+  >
+    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.662c1.746.953 3.71 1.456 5.711 1.457h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+  </svg>
+);
+
 export const Footer = () => {
   const { siteSettings } = useHealthData();
   const { t, language } = useLanguage();
+
+  const teamMembers = [
+    {
+      id: 'sumon',
+      name: 'Sumon Parvez',
+      role: language === 'bn' ? 'ওয়েবসাইট নির্মাতা ও ডেভেলপার' : 'Created & Developed by',
+      subtitle: language === 'bn' ? 'এআই সিস্টেম ও পূর্ণাঙ্গ প্ল্যাটফর্ম' : 'AI Healthcare & Full-Stack Platform',
+      avatar: 'SP',
+      avatarClass: 'team-avatar-lead',
+      roleClass: 'role-pill-lead',
+      verified: true,
+      contacts: [
+        {
+          type: 'phone',
+          icon: PhoneCall,
+          href: 'tel:01743444324',
+          title: language === 'bn' ? 'ফোন: 01743444324' : 'Direct Phone: 01743444324',
+          ariaLabel: 'Call Sumon Parvez at 01743444324',
+          accent: 'phone',
+        },
+        {
+          type: 'whatsapp',
+          icon: WhatsAppIcon,
+          href: 'https://wa.me/8801743444324',
+          title: language === 'bn' ? 'হোয়াটসঅ্যাপ: 01743444324' : 'WhatsApp: 01743444324',
+          ariaLabel: 'Chat with Sumon Parvez on WhatsApp',
+          accent: 'whatsapp',
+        },
+        {
+          type: 'email',
+          icon: Mail,
+          href: 'mailto:msled4344@gmail.com',
+          title: language === 'bn' ? 'ইমেইল: msled4344@gmail.com' : 'Email: msled4344@gmail.com',
+          ariaLabel: 'Email Sumon Parvez at msled4344@gmail.com',
+          accent: 'email',
+        },
+        {
+          type: 'facebook',
+          icon: Facebook,
+          href: 'https://www.facebook.com/sumon.parvez.289496',
+          title: language === 'bn' ? 'ফেসবুক প্রোফাইল' : 'Facebook Profile',
+          ariaLabel: 'Visit Sumon Parvez Facebook Profile',
+          accent: 'facebook',
+        },
+      ],
+    },
+    {
+      id: 'nusrat',
+      name: 'Nusrat Jahan Sumiya',
+      role: language === 'bn' ? 'আইডিয়া' : 'Idea',
+      subtitle: language === 'bn' ? 'স্বাস্থ্য প্রযুক্তি কনসেপ্ট' : 'Healthcare Concept & Vision',
+      avatar: 'NS',
+      avatarClass: 'team-avatar-idea',
+      roleClass: 'role-pill-idea-subtle',
+      contacts: [
+        {
+          type: 'phone',
+          icon: PhoneCall,
+          href: 'tel:01343852079',
+          title: language === 'bn' ? 'ফোন: 01343-852079' : 'Phone: 01343-852079',
+          ariaLabel: 'Call Nusrat Jahan Sumiya at 01343852079',
+          accent: 'phone',
+        },
+        {
+          type: 'whatsapp',
+          icon: WhatsAppIcon,
+          href: 'https://wa.me/8801343852079',
+          title: language === 'bn' ? 'হোয়াটসঅ্যাপ: 01343-852079' : 'WhatsApp: 01343-852079',
+          ariaLabel: 'Chat with Nusrat Jahan Sumiya on WhatsApp',
+          accent: 'whatsapp',
+        },
+      ],
+    },
+    {
+      id: 'najmul',
+      name: 'Najmul Haque',
+      role: language === 'bn' ? 'ইউআই/ইউএক্স ডিজাইনার' : 'UI/UX Designer',
+      subtitle: language === 'bn' ? 'ইন্টারফেস ডিজাইন' : 'User Experience & Interface',
+      avatar: 'NH',
+      avatarClass: 'team-avatar-design',
+      roleClass: 'role-pill-design-subtle',
+      contacts: [
+        {
+          type: 'phone',
+          icon: PhoneCall,
+          href: 'tel:01735911132',
+          title: language === 'bn' ? 'ফোন: 01735-911132' : 'Phone: 01735-911132',
+          ariaLabel: 'Call Najmul Haque at 01735911132',
+          accent: 'phone',
+        },
+        {
+          type: 'whatsapp',
+          icon: WhatsAppIcon,
+          href: 'https://wa.me/8801735911132',
+          title: language === 'bn' ? 'হোয়াটসঅ্যাপ: 01735-911132' : 'WhatsApp: 01735-911132',
+          ariaLabel: 'Chat with Najmul Haque on WhatsApp',
+          accent: 'whatsapp',
+        },
+      ],
+    },
+  ];
 
   return (
     <footer className="footer">
@@ -144,190 +260,48 @@ export const Footer = () => {
           </div>
         </div>
 
-        {/* SYNORA Core Innovation & Development Team Section */}
-        <div className="synora-team-showcase">
-          {/* Main Creator & Developer Card */}
-          <div className="creator-showcase-container">
-            <div className="creator-profile-side">
-              <div className="creator-avatar-wrap">
-                <div className="creator-avatar-monogram">SP</div>
-                <div className="creator-status-dot" title="Active Developer"></div>
-              </div>
-              
-              <div className="creator-info-text">
-                <div className="creator-role-tag">
-                  <Sparkles size={12} className="creator-sparkle-icon" />
-                  <span>{language === 'bn' ? 'ওয়েবসাইট নির্মাতা ও ডেভেলপার' : 'Created & Developed by'}</span>
-                </div>
-                <div className="creator-name-row">
-                  <h3 className="creator-main-name">Sumon Parvez</h3>
-                  <span className="creator-verified-badge" title="Verified Creator">
-                    <CheckCircle2 size={16} />
-                  </span>
-                </div>
-                <p className="creator-bio-line">
-                  {language === 'bn'
-                    ? 'SYNORA ডিজিটাল স্বাস্থ্য প্রযুক্তি ও এআই সিস্টেমের সার্বিক নির্মাতা'
-                    : 'Healthcare AI Architecture & Full-Stack Platform Development'}
-                </p>
-              </div>
-            </div>
-
-            {/* Quick Interactive Contact Cards */}
-            <div className="creator-contact-grid">
-              {/* Phone */}
-              <a
-                href="tel:01743444324"
-                className="creator-contact-card creator-card-phone"
-                title="Call Sumon Parvez"
-              >
-                <div className="creator-icon-box phone-box">
-                  <PhoneCall size={17} />
-                </div>
-                <div className="creator-card-meta">
-                  <span className="creator-card-label">{language === 'bn' ? 'মোবাইল ফোন' : 'Direct Phone'}</span>
-                  <span className="creator-card-val">01743444324</span>
-                </div>
-              </a>
-
-              {/* Email */}
-              <a
-                href="mailto:msled4344@gmail.com"
-                className="creator-contact-card creator-card-email"
-                title="Email Sumon Parvez"
-              >
-                <div className="creator-icon-box email-box">
-                  <Mail size={17} />
-                </div>
-                <div className="creator-card-meta">
-                  <span className="creator-card-label">{language === 'bn' ? 'অফিসিয়াল ইমেইল' : 'Email Address'}</span>
-                  <span className="creator-card-val">msled4344@gmail.com</span>
-                </div>
-              </a>
-
-              {/* WhatsApp */}
-              <a
-                href="https://wa.me/8801743444324"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="creator-contact-card creator-card-whatsapp"
-                title="Chat on WhatsApp"
-              >
-                <div className="creator-icon-box whatsapp-box">
-                  <MessageSquare size={17} />
-                </div>
-                <div className="creator-card-meta">
-                  <span className="creator-card-label">WhatsApp</span>
-                  <span className="creator-card-val">01743444324</span>
-                </div>
-              </a>
-
-              {/* Facebook */}
-              <a
-                href="https://www.facebook.com/sumon.parvez.289496"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="creator-contact-card creator-card-facebook"
-                title="View Facebook Profile"
-              >
-                <div className="creator-icon-box facebook-box">
-                  <Facebook size={17} />
-                </div>
-                <div className="creator-card-meta">
-                  <span className="creator-card-label">Facebook Profile</span>
-                  <span className="creator-card-val creator-link-val">
-                    <span>Connect</span>
-                    <ExternalLink size={12} />
-                  </span>
-                </div>
-              </a>
-            </div>
-          </div>
-
-          {/* Sub Team Grid: Idea & UI/UX Designer */}
-          <div className="team-members-subgrid">
-            {/* 1. Idea - Nusrat Jahan Sumiya */}
-            <div className="team-member-card team-card-idea">
-              <div className="team-card-top">
-                <div className="team-avatar-wrap">
-                  <div className="team-avatar-monogram monogram-idea">NS</div>
-                </div>
-                <div className="team-meta-info">
-                  <div className="team-role-pill role-pill-idea">
-                    <Lightbulb size={12} />
-                    <span>{language === 'bn' ? 'আইডিয়া' : 'Idea'}</span>
-                  </div>
-                  <h4 className="team-member-name">Nusrat Jahan Sumiya</h4>
-                  <p className="team-member-sub">
-                    {language === 'bn' ? 'স্বাস্থ্য প্রযুক্তি ভাবনা ও কনসেপ্ট' : 'Healthcare Concept & Vision'}
-                  </p>
-                </div>
+        {/* Compact, Modern Profile & Team Bar */}
+        <div className="team-profile-strip" aria-label="SYNORA Contributors & Team">
+          {teamMembers.map((member) => (
+            <div key={member.id} className={`team-profile-item ${member.id === 'sumon' ? 'team-profile-lead' : ''}`}>
+              <div className={`team-profile-avatar ${member.avatarClass || ''}`} aria-hidden="true">
+                {member.avatar}
               </div>
 
-              <div className="team-card-actions">
-                <a
-                  href="tel:01343852079"
-                  className="team-contact-btn btn-call"
-                  title="Call Nusrat Jahan Sumiya"
-                >
-                  <PhoneCall size={15} />
-                  <span>01343-852079</span>
-                </a>
+              <div className="team-profile-info">
+                <div className="team-profile-name-row">
+                  <span className="team-profile-name">{member.name}</span>
+                  {member.verified && (
+                    <CheckCircle2 size={13} className="team-profile-verified" title="Verified Creator" />
+                  )}
+                  <span className={`team-profile-role ${member.roleClass || ''}`}>{member.role}</span>
+                </div>
+                {member.subtitle && (
+                  <span className="team-profile-sub">{member.subtitle}</span>
+                )}
+              </div>
 
-                <a
-                  href="https://wa.me/8801343852079"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="team-contact-btn btn-whatsapp"
-                  title="WhatsApp Nusrat Jahan Sumiya"
-                >
-                  <MessageSquare size={15} />
-                  <span>WhatsApp</span>
-                </a>
+              <div className="team-profile-actions">
+                {member.contacts.map((c, i) => {
+                  const IconComp = c.icon;
+                  const isExternal = c.href.startsWith('http');
+                  return (
+                    <a
+                      key={i}
+                      href={c.href}
+                      target={isExternal ? '_blank' : undefined}
+                      rel={isExternal ? 'noopener noreferrer' : undefined}
+                      className={`team-icon-btn team-icon-${c.accent}`}
+                      title={c.title}
+                      aria-label={c.ariaLabel}
+                    >
+                      <IconComp size={14} />
+                    </a>
+                  );
+                })}
               </div>
             </div>
-
-            {/* 2. UI/UX Designer - Najmul Haque */}
-            <div className="team-member-card team-card-design">
-              <div className="team-card-top">
-                <div className="team-avatar-wrap">
-                  <div className="team-avatar-monogram monogram-design">NH</div>
-                </div>
-                <div className="team-meta-info">
-                  <div className="team-role-pill role-pill-design">
-                    <Palette size={12} />
-                    <span>{language === 'bn' ? 'ইউআই/ইউএক্স ডিজাইনার' : 'UI/UX Designer'}</span>
-                  </div>
-                  <h4 className="team-member-name">Najmul Haque</h4>
-                  <p className="team-member-sub">
-                    {language === 'bn' ? 'ইন্টারফেস ও ইউজার এক্সপেরিয়েন্স ডিজাইন' : 'User Experience & Product Interface'}
-                  </p>
-                </div>
-              </div>
-
-              <div className="team-card-actions">
-                <a
-                  href="tel:01735911132"
-                  className="team-contact-btn btn-call"
-                  title="Call Najmul Haque"
-                >
-                  <PhoneCall size={15} />
-                  <span>01735-911132</span>
-                </a>
-
-                <a
-                  href="https://wa.me/8801735911132"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="team-contact-btn btn-whatsapp"
-                  title="WhatsApp Najmul Haque"
-                >
-                  <MessageSquare size={15} />
-                  <span>WhatsApp</span>
-                </a>
-              </div>
-            </div>
-          </div>
+          ))}
         </div>
 
         {/* Medical Disclaimer & Copyright */}

@@ -29,9 +29,12 @@ service cloud.firestore {
       allow update: if isOwner(userId) || isAdmin();
       allow delete: if isAdmin();
       
-      // User's nested sub-collections (e.g. Baby Profiles)
+      // User's nested sub-collections (e.g. Baby Profiles, Prescriptions)
       match /babyProfiles/{babyId} {
         allow read, write: if isOwner(userId);
+      }
+      match /prescriptions/{prescriptionId} {
+        allow read, write, delete: if isOwner(userId);
       }
     }
 
@@ -39,6 +42,13 @@ service cloud.firestore {
     match /healthProfiles/{userId} {
       allow read, write: if isOwner(userId);
       allow delete: if isOwner(userId);
+    }
+
+    // Prescription History (Isolated per User)
+    match /prescriptions/{prescriptionId} {
+      allow read: if isAuthenticated() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if isAuthenticated() && resource.data.userId == request.auth.uid;
     }
 
     // Health Assessments & Score History
