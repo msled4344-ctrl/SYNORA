@@ -128,12 +128,21 @@ export const AiHealth = () => {
           }
         : {};
 
+      const historyPayload = messages
+        .filter((m) => !m.id?.startsWith('msg-welcome') && m.text)
+        .slice(-8)
+        .map((m) => ({
+          role: m.sender === 'ai' ? 'assistant' : 'user',
+          content: m.text,
+        }));
+
       const res = await fetch('/api/ai/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           message: text,
           context: contextPayload,
+          history: historyPayload,
         }),
       });
 

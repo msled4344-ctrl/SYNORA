@@ -1,4 +1,8 @@
 import express from 'express';
+import dotenv from 'dotenv';
+
+dotenv.config();
+
 export const aiRouter = express.Router();
 
 // Knowledge base and symptom reasoning engine for offline/fallback mode
@@ -290,7 +294,103 @@ The symptoms you mentioned (such as severe chest pain, breathing difficulty, sig
       });
     }
 
-    // 2. Check if external Gemini API key is available
+    // 2. Check if OpenRouter API key is available
+    const openRouterApiKey = process.env.OPENROUTER_API_KEY;
+    const openRouterModel = process.env.OPENROUTER_MODEL || 'google/gemini-2.5-flash';
+
+    if (openRouterApiKey) {
+      try {
+        const isBanglaQuery = /[\u0980-\u09FF]|(sordi|kashi|jor|betha|matha|pet|bomi|khabar|ami|amar|ki|korbo|khabo|lagche|hochhe|oshudh)/i.test(trimmedMessage);
+
+        const systemPrompt = `You are SYNORA, an empathetic, safe, highly knowledgeable, and professional digital AI healthcare companion designed for ordinary people and families.
+Clinical & Communication Guidelines:
+1. Warmth & Accessibility: Keep language clear, trustworthy, warm, compassionate, and free of overly complicated medical jargon.
+2. Multilingual Fluency:
+   - If the user communicates in Bengali (বাংলা) or Banglish, respond fluently, naturally, and warmly in Bengali (বাংলা) with clear formatting.
+   - If the user communicates in English, respond in clear, accessible English.
+3. Safety Guardrails:
+   - NEVER pretend to be a doctor, never guarantee a definitive medical diagnosis, and never prescribe dangerous prescription medicines, antibiotics, or unsafe dosages.
+   - Always prioritize safe home self-care remedies, explain possible causes cautiously, specify when to consult a licensed physician, and highlight critical red flags.
+4. Personalization:
+   - User Clinical Context (if provided): ${JSON.stringify(context)}
+5. Formatting:
+   - Use clean Markdown with bold section headings, concise bullet points, and numbered steps for optimal readability.`;
+
+        // Build messages payload including multi-turn history
+        const apiMessages = [
+          { role: 'system', content: systemPrompt },
+        ];
+
+        if (Array.isArray(history) && history.length > 0) {
+          for (const item of history.slice(-8)) {
+            if (item && item.content && typeof item.content === 'string') {
+              apiMessages.push({
+                role: item.role === 'ai' || item.role === 'assistant' ? 'assistant' : 'user',
+                content: item.content.slice(0, 1500),
+              });
+            }
+          }
+        }
+
+        apiMessages.push({
+          role: 'user',
+          content: trimmedMessage,
+        });
+
+        const openRouterResponse = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${openRouterApiKey}`,
+            'HTTP-Referer': 'https://synora.health',
+            'X-Title': 'SYNORA AI Health Companion',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model: openRouterModel,
+            messages: apiMessages,
+            temperature: 0.3,
+            max_tokens: 1500,
+          }),
+        });
+
+        if (openRouterResponse.ok) {
+          const data = await openRouterResponse.json();
+          const generatedText = data.choices?.[0]?.message?.content;
+          if (generatedText) {
+            const isBangla = isBanglaQuery;
+            const followUps = isBangla
+              ? [
+                  'এই লক্ষণগুলো কয়দিন ধরে হচ্ছে?',
+                  'আপনার কি অন্য কোনো ক্রনিক রোগ বা অ্যালার্জি আছে?',
+                  'কোন ঘরোয়া উপায়গুলো এখন সবচেয়ে নিরাপদ?',
+                ]
+              : [
+                  'How long have you been experiencing these symptoms?',
+                  'Are you taking any daily medications or have known allergies?',
+                  'What safe self-care steps are recommended right now?',
+                ];
+
+            return res.json({
+              reply: generatedText,
+              followUps,
+              safetyLevel: 'standard',
+              provider: 'openrouter',
+              model: openRouterModel,
+              disclaimer: isBangla
+                ? 'সিনোরা এআই একটি স্বাস্থ্য তথ্য ও শিক্ষা সহায়িকা। এটি চিকিৎসকের সরাসরি প্রেসক্রিপশনের বিকল্প নয়।'
+                : 'SYNORA AI is an informational wellness companion, not a substitute for professional medical advice.',
+            });
+          }
+        } else {
+          const errData = await openRouterResponse.json().catch(() => ({}));
+          console.warn('OpenRouter API returned non-200 response:', openRouterResponse.status, errData);
+        }
+      } catch (openRouterErr) {
+        console.warn('OpenRouter API call failed, falling back:', openRouterErr.message);
+      }
+    }
+
+    // 3. Fallback: Check if external direct Gemini API key is available
     const geminiApiKey = process.env.GEMINI_API_KEY;
     if (geminiApiKey) {
       try {
@@ -328,6 +428,7 @@ Instructions:
                 'Are you taking any medications or have allergies?',
               ],
               safetyLevel: 'standard',
+              provider: 'gemini',
               disclaimer: 'SYNORA AI is an informational wellness companion, not a substitute for professional medical advice.',
             });
           }
@@ -337,7 +438,7 @@ Instructions:
       }
     }
 
-    // 3. Built-in Clinical Reasoning Engine
+    // 4. Built-in Clinical Reasoning Engine (Offline/Fallback)
     const responseData = generateClinicalResponse(trimmedMessage, context);
     return res.json(responseData);
 
